@@ -1,0 +1,10 @@
+# Default ignored files
+# /.gitignore
+/.idea/
+*.ipynb_checkpoints
+*.DS_Store
+*.pyc
+/wgpack/creds.py
+/wgpack/__pycache__/*
+wgpack/xmls/*
+
