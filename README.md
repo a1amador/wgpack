@@ -20,7 +20,7 @@ Contains data files for example scripts
 ## 1) Create a copy of the remote repository files on your computer in ~/src/:
 `git clone seachest-git:a1amador/wgpack.git`
 
-## 2) Create the environment from the ~/src/calcofi/environment.yml file:
+## 2) Create the environment from the wgpack_environment.yml file:
 `conda env create -f wgpack_environment.yml`
 
 ## 3) Create config.py and creds.py 
