@@ -17,7 +17,7 @@ Contains data files for example scripts
 ---
 # Installation:
 
-## 1) Create a copy of the remote repository files on your computer in ~/src/:
+## 1) Create a copy of the remote repository files on your computer:
 `git clone seachest-git:a1amador/wgpack.git`
 
 ## 2) Create the environment from the wgpack_environment.yml file:
