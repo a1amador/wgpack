@@ -5,6 +5,7 @@
 *.DS_Store
 *.pyc
 /wgpack/creds.py
+/wgpack/config.py
 /wgpack/__pycache__/*
 wgpack/xmls/*
 

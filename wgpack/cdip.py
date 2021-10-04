@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 import pandas as pd
 import netCDF4 as nc
-from wgpack.timeconv import epoch2datetime64
+from wgpack.wgpack.timeconv import epoch2datetime64
 
 def get_CDIP_displacement(stn, startdate, enddate=datetime.datetime.utcnow()):
     '''
