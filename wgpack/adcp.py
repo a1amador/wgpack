@@ -32,7 +32,7 @@ def readADCP_raw(adcp_filepath_in, rdrpath, adcp_filepath_out=False, eng_exit=Tr
     return adcpr
 
 
-def motion_correct_ADCP_gps_h5py(adcpr, dt_gps, dt_avg, mag_dec=None):
+def motion_correct_ADCP_gps_h5py(adcpr, dt_gps, dt_avg, mag_dec=None, qc_flg=False):
     '''
     This function corrects ADCP velocities for Wave Glider motion using GPS-derived velocities.
     :param adcpr: output file from rdradcp.m (.mat file read using h5py)
@@ -135,6 +135,13 @@ def motion_correct_ADCP_gps_h5py(adcpr, dt_gps, dt_avg, mag_dec=None):
     # compute float heading (corrected for heading offset (EA)
     headingf_float = (headingf - EA) % 360
     heading_float = (heading - EA) % 360
+
+    # ------------------------------------------------------------
+    # Q/C ADCP velocities
+    # ------------------------------------------------------------
+    # Note that percent-good (perc_good < 100) already masks velocity data with nans
+    if qc_flg:
+        pass
 
     # ------------------------------------------------------------
     # Process ADCP velocities

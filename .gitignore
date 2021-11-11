@@ -9,3 +9,5 @@
 /wgpack/__pycache__/*
 wgpack/xmls/*
 
+# MISC
+/tests/test_adcp_forRay.ipynb

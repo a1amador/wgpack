@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 import pandas as pd
 import netCDF4 as nc
-from wgpack.wgpack.timeconv import epoch2datetime64
+from wgpack.timeconv import epoch2datetime64
 
 def get_CDIP_displacement(stn, startdate, enddate=datetime.datetime.utcnow()):
     '''
@@ -236,6 +236,7 @@ def get_CDIP_wavevar(stn, var, startdate, enddate=datetime.datetime.utcnow()):
                         var = 'waveSpread'
                         var = 'waveM2Value'
                         var = 'waveN2Value'
+                        var = 'sstSeaSurfaceTemperature'
     :param startdate (str,timestamp,datetime): start date
     :param enddate (str,timestamp,datetime): end date
     :return (dataframe): variable of interest as a function of frequency (and time).
@@ -271,6 +272,14 @@ def get_CDIP_wavevar(stn, var, startdate, enddate=datetime.datetime.utcnow()):
         vardata = ncspec.variables[var][:]
         d = {Fq.data[i]: vardata.data[i] for i in range(len(Fq))}
         CDIPvardf = pd.Series(d)
+    elif (var == 'sstSeaSurfaceTemperature'):
+        vardata = ncspec.variables[var][kk]
+        d = {"SST": vardata.data}
+        d['Date'] = ncDate[kk]
+        # Create dataframe
+        CDIPvardf = pd.DataFrame(d)
+        # set time as index
+        CDIPvardf.set_index('Date', inplace=True)
     else:
         vardata = ncspec.variables[var][kk]
         d = {Fq.data[i]: vardata[:, i].data for i in range(len(Fq))}

@@ -2,7 +2,7 @@
 import numpy as np
 import pandas as pd
 import netCDF4 as nc
-from wgpack.wgpack.timeconv import epoch2datetime64
+from wgpack.timeconv import epoch2datetime64
 
 def read_mwbn(fname):
     '''
@@ -135,7 +135,7 @@ def read_metbuoy(fname):
     wdir_WXT = WXTdat[:,10]     # %column_011: Vector Averaged Wind Direction (deg)
     # pressure
     Hg2mb=33.8639
-    # pressure_WXT = WXTdat[:,22] # %column_023: Sea Level Pressure (mb)
+    SLpressure_WXT = WXTdat[:,22] # %column_023: Sea Level Pressure (mb)
     pressure_WXT = WXTdat[:, 20]*Hg2mb  # %column_021: Barometric Pressure (in. Hg)
     # temperature
     temp_WXT = WXTdat[:,15]     # %column_016: Air Temperature (C)
@@ -153,6 +153,7 @@ def read_metbuoy(fname):
     wspd10_WXT  = wspd10_WXT[p]
     wdir_WXT    = wdir_WXT[p]
     pressure_WXT= pressure_WXT[p]
+    SLpressure_WXT = SLpressure_WXT[p]
     temp_WXT    = temp_WXT[p]
     relhum_WXT  = relhum_WXT[p]
     lat_WXT     = lat_WXT[p]
@@ -163,6 +164,7 @@ def read_metbuoy(fname):
         'WindSpeed'     : wspd_WXT,
         'WindSpeed10'   : wspd10_WXT,
         'WindDirection' : wdir_WXT,
+        'SLpressure'    : SLpressure_WXT,
         'pressure'      : pressure_WXT,
         'temperature'   : temp_WXT,
         'RelativeHumidity': relhum_WXT,

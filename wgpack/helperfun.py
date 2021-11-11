@@ -78,4 +78,11 @@ def nan_interpolate(x, n):
     import pandas as pd
     return pd.Series(x).interpolate(method='linear', limit=n).values
 
+def rotate_via_numpy(x,y,radians):
+    """Use numpy to build a rotation matrix and take the dot product."""
+    import numpy as np
+    c, s = np.cos(radians), np.sin(radians)
+    j = np.matrix([[c, s], [-s, c]])
+    m = np.dot(j, [x, y])
+    return float(m.T[0]), float(m.T[1])
 
