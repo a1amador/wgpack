@@ -15,19 +15,28 @@ dependencies:
   - backports.functools_lru_cache
   - bcrypt
   - beautifulsoup4
-  - blas
   - bleach
-  - brotli
+  - boost-cpp
+  - branca
   - brotlipy
   - bs4
+  - bzip2
   - c-ares
   - ca-certificates
   - cached-property
   - cached_property
+  - cairo
+  - cartopy
   - certifi
   - cffi
+  - cfitsio
   - cftime
   - charset-normalizer
+  - click
+  - click-plugins
+  - cligj
+  - cmocean
+  - colorspacious
   - cryptography
   - curl
   - cycler
@@ -35,24 +44,38 @@ dependencies:
   - decorator
   - defusedxml
   - entrypoints
-  - fonttools
+  - expat
+  - fiona
+  - folium
+  - fontconfig
   - freetype
+  - freexl
+  - gdal
   - geographiclib
+  - geopandas
+  - geopandas-base
   - geopy
+  - geos
+  - geotiff
+  - gettext
+  - giflib
+  - gsw
   - h5py
   - hdf4
   - hdf5
   - icu
   - idna
   - importlib-metadata
-  - intel-openmp
   - ipykernel
   - ipython
   - ipython_genutils
   - isodate
+  - jbig
   - jedi
   - jinja2
+  - joblib
   - jpeg
+  - json-c
   - json5
   - jsonschema
   - jupyter_client
@@ -61,37 +84,54 @@ dependencies:
   - jupyterlab
   - jupyterlab_pygments
   - jupyterlab_server
+  - kealib
   - kiwisolver
   - krb5
   - lcms2
+  - lerc
+  - libblas
+  - libcblas
   - libcurl
   - libcxx
+  - libdap4
+  - libdeflate
   - libedit
   - libev
   - libffi
+  - libgdal
   - libgfortran
+  - libgfortran5
+  - libglib
   - libiconv
+  - libkml
+  - liblapack
   - libnetcdf
   - libnghttp2
+  - libopenblas
   - libpng
+  - libpq
+  - librttopo
   - libsodium
+  - libspatialindex
+  - libspatialite
   - libssh2
   - libtiff
   - libwebp-base
   - libxml2
   - libxslt
+  - libzip
+  - libzlib
+  - llvm-openmp
   - lxml
   - lz4-c
+  - mapclassify
   - markupsafe
   - matplotlib
   - matplotlib-base
   - matplotlib-inline
+  - matplotlib-scalebar
   - mistune
-  - mkl
-  - mkl-service
-  - mkl_fft
-  - mkl_random
-  - munkres
+  - munch
   - nbclassic
   - nbclient
   - nbconvert
@@ -99,9 +139,9 @@ dependencies:
   - ncurses
   - nest-asyncio
   - netcdf4
+  - networkx
   - notebook
   - numpy
-  - numpy-base
   - olefile
   - openjpeg
   - openssl
@@ -111,11 +151,16 @@ dependencies:
   - pandocfilters
   - paramiko
   - parso
+  - pcre
   - pexpect
   - pickleshare
   - pillow
   - pip
+  - pixman
   - platformdirs
+  - poppler
+  - poppler-data
+  - postgresql
   - proj
   - prometheus_client
   - prompt-toolkit
@@ -127,9 +172,11 @@ dependencies:
   - pyparsing
   - pyproj
   - pyrsistent
+  - pyshp
   - pysocks
   - python
   - python-dateutil
+  - python-wget
   - python_abi
   - pytz
   - pyzmq
@@ -138,24 +185,34 @@ dependencies:
   - requests-file
   - requests-toolbelt
   - requests-unixsocket
+  - rtree
+  - scikit-learn
+  - scipy
   - seawater
   - send2trash
   - setuptools
+  - shapely
+  - simplekml
   - six
   - sniffio
   - soupsieve
   - sqlite
   - terminado
   - testpath
+  - threadpoolctl
+  - tiledb
   - tk
   - tornado
   - traitlets
+  - tzcode
   - tzdata
   - urllib3
   - wcwidth
   - webencodings
   - websocket-client
   - wheel
+  - xerces-c
+  - xyzservices
   - xz
   - zeep
   - zeromq
@@ -164,3 +221,4 @@ dependencies:
   - zstd
   - pip:
     - matlabengineforpython
+prefix: /Users/a1amador/opt/miniconda3/envs/wgpack
