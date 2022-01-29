@@ -11,3 +11,5 @@ wgpack/xmls/*
 
 # MISC
 /tests/test_adcp_forRay.ipynb
+/tests/plotWGadcp_autoplot.ipynb
+/tests/plotWGadcp_autoplot_concat.ipynb
