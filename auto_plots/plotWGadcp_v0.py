@@ -37,7 +37,9 @@ if tw is not None:
     tst = now - pd.Timedelta(days=float(tw))
 else:
     # use last 7 days
-    tst = now - pd.Timedelta(days=7)
+    # tst = now - pd.Timedelta(days=7)
+    # use prescribed splash date
+    tst = datetime(2022, 1, 21, 19, 55, 17, 469297)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Processing
@@ -538,8 +540,8 @@ mtime = np.array(mtime)
 mtime_bar = np.array(mtime_bar)
 
 # create dictionary
-mdic = {"time": tt_WG,
-        "time_bar": ttbar_WG,
+mdic = {"time": tt_WG.values.astype(float)/1E9,
+        "time_bar": ttbar_WG.astype(float)/1E6,
         "mtime": mtime,
         "mtime_bar": mtime_bar,
         "lon": lon,
@@ -558,9 +560,10 @@ mdic = {"time": tt_WG,
         "Evel_bar": Ubar_WG,
         "Nvel_bar": Vbar_WG,
         'dt_gps': dt_gps,
-        'dt_avg': dt_avg,
+        # 'dt_avg': dt_avg,
         'sog': sog_lonlat,
-        'cog': cog_lonlat
+        'cog': cog_lonlat,
+        'config': adcpr['config']
        }
 
 # Save output as mat file
@@ -568,7 +571,10 @@ proc_dir = os.path.join(seachest_data_dir,vnam,'current/nrt/adcp_mc')
 fnamout_mat = 'adcp_mc.mat'
 savemat(os.path.join(proc_dir,fnamout_mat), mdic)
 print('saved matlab ouput to '+os.path.join(proc_dir,fnamout_mat))
-
+# grant read permissions to all users for output file
+cmd = 'chmod a+r ' + os.path.join(proc_dir,fnamout_mat)
+os.system(cmd)
+print('granted read permission to all users for:\n' + os.path.join(proc_dir,fnamout_mat))
 
 # --------------------------------------------------------
 # Set local paths and import local packages
