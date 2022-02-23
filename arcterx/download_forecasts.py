@@ -23,12 +23,18 @@ tb = (datetime.datetime.utcnow() + pd.Timedelta(days=5)).strftime('%Y-%m-%dT')+'
 # ----------------------------------------------------------------------------------------------------------------------
 
 # url
+# data_url = 'https://pae-paha.pacioos.hawaii.edu/thredds/ncss/roms_marig/ROMS_Guam_Regional_Ocean_Model_best.ncd?'+\
+#            'var=zeta&var=salt&var=temp&var=u&var=v&'+\
+#            'north=15.9753'+'&'+\
+#            'west=142.9187'+'&'+\
+#            'east=146.9722'+'&'+\
+#            'south=11.9373'+'&'+\
+#            'disableLLSubset=on&disableProjSubset=on&horizStride=1&'+\
+#            'time_start='+ta+'&'+\
+#            'time_end='+tb+'&'+\
+#            'timeStride=1&vertCoord='
 data_url = 'https://pae-paha.pacioos.hawaii.edu/thredds/ncss/roms_marig/ROMS_Guam_Regional_Ocean_Model_best.ncd?'+\
            'var=zeta&var=salt&var=temp&var=u&var=v&'+\
-           'north=15.9753'+'&'+\
-           'west=142.9187'+'&'+\
-           'east=146.9722'+'&'+\
-           'south=11.9373'+'&'+\
            'disableLLSubset=on&disableProjSubset=on&horizStride=1&'+\
            'time_start='+ta+'&'+\
            'time_end='+tb+'&'+\
@@ -58,12 +64,18 @@ if dwld_flg:
 # ----------------------------------------------------------------------------------------------------------------------
 
 # url
+# data_url = 'https://pae-paha.pacioos.hawaii.edu/thredds/ncss/wrf_guam/WRF_Guam_Regional_Atmospheric_Model_best.ncd?'+\
+#            'var=Pair&var=Qair&var=Tair&var=Uwind&var=Vwind&var=lwrad_down&var=rain&var=swrad&'+\
+#            'north=15.9785'+'&'+\
+#            'west=142.9017'+'&'+\
+#            'east=147.0724'+'&'+\
+#            'south=11.9318'+'&'+\
+#            'disableLLSubset=on&disableProjSubset=on&horizStride=1&'+\
+#            'time_start='+ta+'&'+\
+#            'time_end='+tb+'&'+\
+#            'timeStride=1'
 data_url = 'https://pae-paha.pacioos.hawaii.edu/thredds/ncss/wrf_guam/WRF_Guam_Regional_Atmospheric_Model_best.ncd?'+\
            'var=Pair&var=Qair&var=Tair&var=Uwind&var=Vwind&var=lwrad_down&var=rain&var=swrad&'+\
-           'north=15.9785'+'&'+\
-           'west=142.9017'+'&'+\
-           'east=147.0724'+'&'+\
-           'south=11.9318'+'&'+\
            'disableLLSubset=on&disableProjSubset=on&horizStride=1&'+\
            'time_start='+ta+'&'+\
            'time_end='+tb+'&'+\
