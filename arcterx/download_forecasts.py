@@ -35,7 +35,7 @@ data_url = 'https://pae-paha.pacioos.hawaii.edu/thredds/ncss/roms_marig/ROMS_Gua
            'timeStride=1&vertCoord='
 
 # filename
-filename = 'ROMS_Guam_' + datetime.datetime.utcnow().strftime('%Y%m%d') + '.ncd '
+filename = 'ROMS_Guam_' + datetime.datetime.utcnow().strftime('%Y%m%d') + '.ncd'
 dfnam    = os.path.join(datadir,filename)
 
 # Download data?
@@ -70,7 +70,7 @@ data_url = 'https://pae-paha.pacioos.hawaii.edu/thredds/ncss/wrf_guam/WRF_Guam_R
            'timeStride=1'
 
 # filename
-filename = 'WRF_Guam_' + datetime.datetime.utcnow().strftime('%Y%m%d') + '.ncd '
+filename = 'WRF_Guam_' + datetime.datetime.utcnow().strftime('%Y%m%d') + '.ncd'
 dfnam    = os.path.join(datadir,filename)
 
 # Download data?
@@ -101,7 +101,7 @@ data_url = 'https://pae-paha.pacioos.hawaii.edu/thredds/ncss/ww3_mariana/WaveWat
            'timeStride=1&vertCoord='
 
 # filename
-filename = 'WaveWatch_III_Mariana_' + datetime.datetime.utcnow().strftime('%Y%m%d') + '.ncd '
+filename = 'WaveWatch_III_Mariana_' + datetime.datetime.utcnow().strftime('%Y%m%d') + '.ncd'
 dfnam    = os.path.join(datadir,filename)
 
 # Download data?
