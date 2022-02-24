@@ -499,7 +499,8 @@ axc.set_visible(False)
 cbar = fig.colorbar(c, ax=axc,orientation='vertical')
 cax = cbar.ax
 # Add label on top of colorbar.
-cbar.ax.set_xlabel("[m/s]",fontsize=labsz)
+# cbar.ax.set_xlabel("[m/s]",fontsize=labsz)
+cbar.ax.set_xlabel("[m/s]")
 cbar.ax.xaxis.set_label_position('top')
 cbar.ax.tick_params(labelsize=labsz)
 
