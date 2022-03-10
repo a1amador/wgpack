@@ -341,8 +341,6 @@ isub = 3
 levels = np.linspace(0,10,101)
 
 axd['ax3'].set_extent([lon_WRF.min(), lon_WRF.max(), lat_WRF.min(), lat_WRF.max()])
-axd['ax3'].add_feature(LAND)
-axd['ax3'].coastlines(resolution='10m')
 gl = axd['ax3'].gridlines(draw_labels=True)
 gl.xlabels_top = gl.ylabels_right = False
 gl.xformatter = LONGITUDE_FORMATTER
@@ -351,6 +349,10 @@ gl.yformatter = LATITUDE_FORMATTER
 # contour plot
 cf = axd['ax3'].contourf(lon_WRF, lat_WRF, u10_mag, levels=levels, cmap='jet',
                  transform=ccrs.PlateCarree())
+
+# add land and coastlines
+axd['ax3'].add_feature(LAND)
+axd['ax3'].coastlines(resolution='10m')
 
 # plot Wave Glider location
 axd['ax3'].plot(Telemdf['longitude'].values,Telemdf['latitude'].values,':k')
