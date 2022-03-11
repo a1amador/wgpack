@@ -276,7 +276,7 @@ gl.xformatter = LONGITUDE_FORMATTER
 gl.yformatter = LATITUDE_FORMATTER
 
 # contour plot
-cf = axd['ax1'].contourf(lon_WW3, lat_WW3, Hs, levels=levels, cmap='jet',
+cf = axd['ax1'].contourf(lon_WW3, lat_WW3, Hs, levels=levels, cmap='jet', extend="both",
                  transform=ccrs.PlateCarree())
 
 # add land and coastlines
@@ -313,7 +313,7 @@ gl.xformatter = LONGITUDE_FORMATTER
 gl.yformatter = LATITUDE_FORMATTER
 
 # contour plot
-cf = axd['ax2'].contourf(lon_WW3, lat_WW3, Tp, levels=levels, cmap='jet',
+cf = axd['ax2'].contourf(lon_WW3, lat_WW3, Tp, levels=levels, cmap='jet', extend="both",
                  transform=ccrs.PlateCarree())
 
 # add land and coastlines
@@ -341,7 +341,7 @@ axd['ax2'].set_title('WW3 peak period (Tp)');
 # --------------------------------------------------------------------------------------------
 # config for u10
 isub = 3
-levels = np.linspace(0,10,101)
+levels = np.linspace(0,15,101)
 
 axd['ax3'].set_extent([lon_WRF.min(), lon_WRF.max(), lat_WRF.min(), lat_WRF.max()])
 gl = axd['ax3'].gridlines(draw_labels=True)
@@ -350,7 +350,7 @@ gl.xformatter = LONGITUDE_FORMATTER
 gl.yformatter = LATITUDE_FORMATTER
 
 # contour plot
-cf = axd['ax3'].contourf(lon_WRF, lat_WRF, u10_mag, levels=levels, cmap='jet',
+cf = axd['ax3'].contourf(lon_WRF, lat_WRF, u10_mag, levels=levels, cmap='jet', extend="both",
                  transform=ccrs.PlateCarree())
 
 # add land and coastlines
@@ -387,7 +387,7 @@ gl.xformatter = LONGITUDE_FORMATTER
 gl.yformatter = LATITUDE_FORMATTER
 
 # contour plot
-cf = axd['ax4'].contourf(lon_ROMS, lat_ROMS, vel_mag, levels=levels, cmap='jet',
+cf = axd['ax4'].contourf(lon_ROMS, lat_ROMS, vel_mag, levels=levels, cmap='jet', extend="both",
                  transform=ccrs.PlateCarree())
 
 # add land and coastlines
