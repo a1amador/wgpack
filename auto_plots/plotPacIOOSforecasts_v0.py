@@ -8,6 +8,7 @@ import re
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from geopy.distance import distance
+import pyproj
 
 
 # module_path = os.path.abspath(os.path.join('..'))
@@ -35,10 +36,13 @@ channels= args[2]           # Slack channel
 tw      = args[3]           # time window to display specified in days (ends at present time)
 tw = None if tw == 'None' else tw
 prj     = args[4]           # project folder name (e.g., 'calcofi', 'tfo', etc.)
-# vnam,channels,tw,prj =  'sv3-251','C0158P2JJTT','4','westpac'
+# vnam,channels,tw,prj =  'sv3-251','C0158P2JJTT','None','westpac'
 
 print('vehicle:',vnam)
 print('project:',prj)
+# plot relative vorticity?
+rel_vor_flg = True
+
 # ----------------------------------------------------------------------------------------------------------------------
 # Set start date according to the time window to be considered
 now = datetime.utcnow()
@@ -136,8 +140,16 @@ u_sl = np.mean(ROMS_data['u'][iit, iida, iia_lat:iib_lat, iia_lon:iib_lon],axis=
 v_sl = np.mean(ROMS_data['v'][iit, iida, iia_lat:iib_lat, iia_lon:iib_lon],axis=0)
 lon_ROMS = ROMS_data['lon'][iia_lon:iib_lon]
 lat_ROMS = ROMS_data['lat'][iia_lat:iib_lat]
+# project to UTM to convert to meters
+myproj = pyproj.Proj(proj='utm',zone=55,ellps='WGS84', units='m', preserve_units=False)
+xy_lst = [myproj(x, y) for x,y in zip(lon_ROMS[:], lat_ROMS[:])]
+xUTM = np.array([x[0] for x in xy_lst])
+yUTM = np.array([y[-1] for y in xy_lst])
+dxx, dyy = np.meshgrid(np.gradient(xUTM), np.gradient(yUTM))
 # compute velocity magnitude
 vel_mag = np.sqrt(u_sl**2+v_sl**2)
+# compute vorticity
+rel_vor = np.gradient(v_sl,axis=-1)/dxx - np.gradient(u_sl,axis=0)/dyy
 
 # ----------------------------------------------------------------------------------------------------------------------
 # LOAD WRF data
@@ -183,7 +195,7 @@ u10 = WRF_data['Uwind'][iit, iia_lat:iib_lat, iia_lon:iib_lon]
 v10 = WRF_data['Vwind'][iit, iia_lat:iib_lat, iia_lon:iib_lon]
 lon_WRF = WRF_data['lon'][iia_lon:iib_lon]
 lat_WRF = WRF_data['lat'][iia_lat:iib_lat]
-# # compute velocity magnitude
+# compute wind velocity magnitude
 u10_mag = np.sqrt(u10**2+v10**2)
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -376,9 +388,13 @@ axd['ax3'].set_title('WRF 10-m winds');
 # --------------------------------------------------------------------------------------------
 # Currents
 # --------------------------------------------------------------------------------------------
-# config for u10
+# config for currents
 isub = 2
-levels = np.linspace(0,0.5,101)
+if rel_vor_flg:
+    cL = np.round(np.max(np.abs(rel_vor)), 6)
+    levels = np.linspace(-cL,cL,101)
+else:
+    levels = np.linspace(0,0.5,101)
 
 axd['ax4'].set_extent([lon_ROMS.min(), lon_ROMS.max(), lat_ROMS.min(), lat_ROMS.max()])
 gl = axd['ax4'].gridlines(draw_labels=True)
@@ -387,8 +403,12 @@ gl.xformatter = LONGITUDE_FORMATTER
 gl.yformatter = LATITUDE_FORMATTER
 
 # contour plot
-cf = axd['ax4'].contourf(lon_ROMS, lat_ROMS, vel_mag, levels=levels, cmap='jet', extend="both",
-                 transform=ccrs.PlateCarree())
+if rel_vor_flg:
+    cf = axd['ax4'].contourf(lon_ROMS, lat_ROMS, rel_vor, levels=levels, cmap='bwr', extend="both",
+                             transform=ccrs.PlateCarree())
+else:
+    cf = axd['ax4'].contourf(lon_ROMS, lat_ROMS, vel_mag, levels=levels, cmap='jet', extend="both",
+                             transform=ccrs.PlateCarree())
 
 # add land and coastlines
 axd['ax4'].add_feature(LAND)
@@ -406,9 +426,14 @@ legend_vel=1.0
 Q = axd['ax4'].quiver(lon_ROMS[::isub], lat_ROMS[::isub], u_sl[::isub,::isub], v_sl[::isub,::isub], pivot='middle')
 
 # colorbar and labels
-cb = fig.colorbar(cf, ax=axd['ax4'], shrink=0.95,ticks=np.linspace(levels[0],levels[-1],11))
-cb.ax.set_title('m s$^{-1}$')
-axd['ax4'].set_title('ROMS sea surface currents');
+if rel_vor_flg:
+    cb = fig.colorbar(cf, ax=axd['ax4'], shrink=0.95)
+    cb.ax.set_title('s$^{-1}$\n')
+    axd['ax4'].set_title('ROMS relative vorticity')
+else:
+    cb = fig.colorbar(cf, ax=axd['ax4'], shrink=0.95,ticks=np.linspace(levels[0],levels[-1],11))
+    cb.ax.set_title('m s$^{-1}$')
+    axd['ax4'].set_title('ROMS sea surface currents')
 
 # --------------------------------------------------------------------------------------------
 # Vehicle SOG
