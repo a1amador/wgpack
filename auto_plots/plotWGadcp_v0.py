@@ -503,7 +503,7 @@ cbar.ax.set_xlabel("[m/s]",fontsize=labsz)
 cbar.ax.xaxis.set_label_position('top')
 cbar.ax.tick_params(labelsize=labsz)
 
-# Save figure
+# figure title
 tmstmp = now.strftime('%Y-%m-%d, %H:%M UTC')
 fig.suptitle(vnam + ': ADCP output ' + tmstmp, fontsize=16)
 fig.show()

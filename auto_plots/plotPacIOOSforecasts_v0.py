@@ -148,8 +148,12 @@ yUTM = np.array([y[-1] for y in xy_lst])
 dxx, dyy = np.meshgrid(np.gradient(xUTM), np.gradient(yUTM))
 # compute velocity magnitude
 vel_mag = np.sqrt(u_sl**2+v_sl**2)
-# compute vorticity
+# compute relative vorticity
 rel_vor = np.gradient(v_sl,axis=-1)/dxx - np.gradient(u_sl,axis=0)/dyy
+# Earth's rotation rate
+Om = 2*np.pi/(24*3600)
+# planetrary vorticity (Coriolis parameter)
+f = 2*Om*np.sin(np.deg2rad(np.mean(lat_ROMS)))
 
 # ----------------------------------------------------------------------------------------------------------------------
 # LOAD WRF data
