@@ -75,7 +75,8 @@ try:
     # Store in dataframe
     ctdDPdf['DO (ml/L)'] = DOdict['DOmlL']
     ctdDPdf['DO (muM/kg)'] = DOdict['DOmuMkg']
-except:
+except RuntimeError as err:
+    print(err)
     print("Something went wrong when retrieving CTD data from LRI's Data Portal")
     flg_plt = False
 
