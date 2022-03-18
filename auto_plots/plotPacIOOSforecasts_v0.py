@@ -18,6 +18,7 @@ if module_path not in sys.path:
     sys.path.append(module_path)
 from wgpack.nav import get_bearing
 from wgpack.config import seachest_data_dir
+from wgpack.timeconv import epoch2datetime64
 datadir  = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/forecasts')
 
 # Data service path
@@ -92,6 +93,36 @@ for index, row in Telemdf[:-1].iterrows():
 # not sure if these are trustworthy
 speedOverGround = Telemdf['speedOverGround'].values*kt2mps
 gliderSpeed = Telemdf['gliderSpeed'].values*kt2mps
+
+# ----------------------------------------------------------------------------------------------------------------------
+# LOAD Sea Glider data
+SGdatadir  = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/sg526')
+# filename = 'sg526_ARCTERX_1.0m_up_and_down_profile.nc'
+filename = 'sg526_ARCTERX_timeseries.nc'
+SGfnam    = os.path.join(SGdatadir,filename)
+SG_data = netcdf.Dataset(SGfnam)
+# Sea Glider time
+# ttSG = pd.to_datetime(epoch2datetime64(SG_data['start_time'][:]))
+ttSG = pd.to_datetime(epoch2datetime64(SG_data['end_time'][:]))
+# SG time index associated with start time
+iiaSG = np.abs(ttSG - tst).argmin()
+# crop data
+SG_stlon = SG_data['start_longitude'][iiaSG:]
+SG_stlat = SG_data['start_latitude'][iiaSG:]
+SG_enlon = SG_data['end_longitude'][iiaSG:]
+SG_enlat = SG_data['end_latitude'][iiaSG:]
+ttSG = ttSG[iiaSG:]
+
+# ----------------------------------------------------------------------------------------------------------------------
+# Compute distance between Sea Glider and Wave Glider
+r_SG_WG=[]
+for t,lon,lat in zip(ttSG,SG_enlon,SG_enlat):
+    cc = np.abs(Telemdf.index-t).argmin()
+    p1 = (lat,lon)
+    p2 = (Telemdf.iloc[cc]['latitude'],Telemdf.iloc[cc]['longitude'])
+    r_SG_WG.append(distance(p1,p2).km)
+# convert to array
+r_SG_WG = np.array(r_SG_WG)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # LOAD ROMS data
@@ -268,15 +299,15 @@ from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 labsz = 12
 fntsz = 14
 widths = [1, 1]
-heights = [1, 1, 0.5]
+heights = [1, 1, 0.5, 0.5]
 gs_kw = dict(width_ratios=widths, height_ratios=heights)
 
 # configure general cartopy parameters
 LAND = NaturalEarthFeature('physical', 'land', '10m', edgecolor='face',
                            facecolor=COLORS['land'])
 
-fig, axd = plt.subplot_mosaic([['ax1', 'ax2'], ['ax3', 'ax4'], ['ax5', 'ax5']], gridspec_kw=gs_kw,
-                              figsize=(14, 15), subplot_kw=dict(projection=ccrs.PlateCarree()))
+fig, axd = plt.subplot_mosaic([['ax1', 'ax2'], ['ax3', 'ax4'], ['ax5', 'ax5'], ['ax6', 'ax6']], gridspec_kw=gs_kw,
+                              figsize=(14, 18), subplot_kw=dict(projection=ccrs.PlateCarree()))
 
 # --------------------------------------------------------------------------------------------
 # Hs
@@ -302,6 +333,11 @@ axd['ax1'].coastlines(resolution='10m')
 # plot Wave Glider location
 axd['ax1'].plot(Telemdf['longitude'].values,Telemdf['latitude'].values,':k')
 axd['ax1'].plot(Telemdf['longitude'].values[-1],Telemdf['latitude'].values[-1],'gd',mec='k',ms=12, label=vnam)
+# plot Sea Glider location
+axd['ax1'].plot(SG_stlon, SG_stlat,'.m')
+axd['ax1'].plot(SG_enlon, SG_enlat,':m')
+axd['ax1'].plot(SG_enlon[-1], SG_enlat[-1],'mo',mec='k',ms=12, label='SG526')
+# Legend
 axd['ax1'].legend(fontsize=fntsz,loc='upper left')
 # tick params
 axd['ax1'].tick_params(labelsize=fntsz)
@@ -312,7 +348,7 @@ Q = axd['ax1'].quiver(lon_WW3, lat_WW3, uw, vw, pivot='middle')
 
 # colorbar and labels
 cb = fig.colorbar(cf, ax=axd['ax1'], shrink=0.95,ticks=np.linspace(levels[0],levels[-1],11))
-cb.ax.set_title('m')
+cb.ax.set_title('m\n')
 axd['ax1'].set_title('WW3 significant wave height (Hs)');
 
 # --------------------------------------------------------------------------------------------
@@ -339,6 +375,11 @@ axd['ax2'].coastlines(resolution='10m')
 # plot Wave Glider location
 axd['ax2'].plot(Telemdf['longitude'].values,Telemdf['latitude'].values,':k')
 axd['ax2'].plot(Telemdf['longitude'].values[-1],Telemdf['latitude'].values[-1],'gd',mec='k',ms=12, label=vnam)
+# plot Sea Glider location
+axd['ax2'].plot(SG_stlon, SG_stlat,'.m')
+axd['ax2'].plot(SG_enlon, SG_enlat,':m')
+axd['ax2'].plot(SG_enlon[-1], SG_enlat[-1],'mo',mec='k',ms=12, label='SG526')
+# Legend
 axd['ax2'].legend(fontsize=fntsz,loc='upper left')
 # tick params
 axd['ax2'].tick_params(labelsize=fntsz)
@@ -349,7 +390,7 @@ Q = axd['ax2'].quiver(lon_WW3, lat_WW3, uw, vw, pivot='middle')
 
 # colorbar and labels
 cb = fig.colorbar(cf, ax=axd['ax2'], shrink=0.95,ticks=np.linspace(levels[0],levels[-1],17))
-cb.ax.set_title('s')
+cb.ax.set_title('s\n')
 axd['ax2'].set_title('WW3 peak period (Tp)');
 
 # --------------------------------------------------------------------------------------------
@@ -376,6 +417,11 @@ axd['ax3'].coastlines(resolution='10m')
 # plot Wave Glider location
 axd['ax3'].plot(Telemdf['longitude'].values,Telemdf['latitude'].values,':k')
 axd['ax3'].plot(Telemdf['longitude'].values[-1],Telemdf['latitude'].values[-1],'gd',mec='k',ms=12, label=vnam)
+# plot Sea Glider location
+axd['ax3'].plot(SG_stlon, SG_stlat,'.m')
+axd['ax3'].plot(SG_enlon, SG_enlat,':m')
+axd['ax3'].plot(SG_enlon[-1], SG_enlat[-1],'mo',mec='k',ms=12, label='SG526')
+# Legend
 axd['ax3'].legend(fontsize=fntsz,loc='upper left')
 # tick params
 axd['ax3'].tick_params(labelsize=fntsz)
@@ -386,7 +432,7 @@ Q = axd['ax3'].quiver(lon_WRF[::isub], lat_WRF[::isub], u10[::isub,::isub], v10[
 
 # colorbar and labels
 cb = fig.colorbar(cf, ax=axd['ax3'], shrink=0.95,ticks=np.linspace(levels[0],levels[-1],11))
-cb.ax.set_title('m s$^{-1}$')
+cb.ax.set_title('m s$^{-1}$\n')
 axd['ax3'].set_title('WRF 10-m winds');
 
 # --------------------------------------------------------------------------------------------
@@ -421,6 +467,11 @@ axd['ax4'].coastlines(resolution='10m')
 # plot Wave Glider location
 axd['ax4'].plot(Telemdf['longitude'].values,Telemdf['latitude'].values,':k')
 axd['ax4'].plot(Telemdf['longitude'].values[-1],Telemdf['latitude'].values[-1],'gd',mec='k',ms=12, label=vnam)
+# plot Sea Glider location
+axd['ax4'].plot(SG_stlon, SG_stlat,'.m')
+axd['ax4'].plot(SG_enlon, SG_enlat,':m')
+axd['ax4'].plot(SG_enlon[-1], SG_enlat[-1],'mo',mec='k',ms=12, label='SG526')
+# Legend
 axd['ax4'].legend(fontsize=fntsz,loc='upper left')
 # tick params
 axd['ax4'].tick_params(labelsize=fntsz)
@@ -436,21 +487,34 @@ if rel_vor_flg:
     axd['ax4'].set_title('ROMS relative vorticity')
 else:
     cb = fig.colorbar(cf, ax=axd['ax4'], shrink=0.95,ticks=np.linspace(levels[0],levels[-1],11))
-    cb.ax.set_title('m s$^{-1}$')
+    cb.ax.set_title('m s$^{-1}$\n')
     axd['ax4'].set_title('ROMS sea surface currents')
+
+# --------------------------------------------------------------------------------------------
+# Add timeseries plots
+# --------------------------------------------------------------------------------------------
+fig.delaxes(axd['ax5'])
+fig.delaxes(axd['ax6'])
+gs = fig.add_gridspec(ncols=2, nrows = 4,width_ratios=widths, height_ratios=heights)
+
+# --------------------------------------------------------------------------------------------
+# SG-WG distance
+# --------------------------------------------------------------------------------------------
+ax5 = fig.add_subplot(gs[-2, :])
+ax5.plot(ttSG, r_SG_WG,'-k')
+ax5.set_ylabel('SG-WG distance [km]',fontsize=fntsz)
+ax5.set_xlim(Telemdf.index[0],Telemdf.index[-1])
+ax5.grid(':')
 
 # --------------------------------------------------------------------------------------------
 # Vehicle SOG
 # --------------------------------------------------------------------------------------------
-fig.delaxes(axd['ax5'])
-gs = fig.add_gridspec(ncols=2, nrows = 3,width_ratios=widths, height_ratios=heights)
 ax = fig.add_subplot(gs[-1, :])
 ax.plot(Telemdf.index[:-1], sog_lonlat,'-k',label='observed')
 ax.set_ylabel('SOG [m s$^{-1}$]',fontsize=fntsz)
 ax.legend(fontsize=labsz)
 ax.set_xlim(Telemdf.index[0],Telemdf.index[-1])
 ax.grid(':')
-
 
 # Add a big title at the top
 tmstmp = now.strftime('%Y-%m-%d, %H:%M UTC')
