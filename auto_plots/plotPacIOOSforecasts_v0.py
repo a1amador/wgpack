@@ -38,6 +38,7 @@ tw      = args[3]           # time window to display specified in days (ends at 
 tw = None if tw == 'None' else tw
 prj     = args[4]           # project folder name (e.g., 'calcofi', 'tfo', etc.)
 # vnam,channels,tw,prj =  'sv3-251','C0158P2JJTT','None','westpac'
+# vnam,channels,tw,prj =  'sv3-253','C0158P2JJTT','None','westpac'
 
 print('vehicle:',vnam)
 print('project:',prj)
@@ -156,6 +157,14 @@ iia_lon = max(iilonWG-nii,0)
 iib_lon = min(iilonWG+nii,iiL)
 iia_lat = max(iilatWG-nii,0)
 iib_lat = min(iilatWG+nii,iiL)
+# crop further if needed:
+if np.logical_or(iib_lon-iia_lon<nii,iib_lat-iia_lat<nii):
+    nii = min(iib_lon-iia_lon, iib_lat-iia_lat)
+    iia_lon = max(iilonWG - nii, 0)
+    iib_lon = min(iilonWG + nii, iiL)
+    iia_lat = max(iilatWG - nii, 0)
+    iib_lat = min(iilatWG + nii, iiL)
+
 # find nearest time interval
 print(ROMS_data['time'].units)
 match = re.search(r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}', ROMS_data['time'].units)

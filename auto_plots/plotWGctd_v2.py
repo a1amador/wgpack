@@ -184,6 +184,42 @@ if prj == 'westpac':
     T_ROMSn, S_ROMSn = np.array(T_ROMSn), np.array(S_ROMSn)
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Load Sea Glider data
+# ----------------------------------------------------------------------------------------------------------------------
+if prj == 'westpac':
+    import netCDF4 as netcdf
+    from wgpack.timeconv import epoch2datetime64
+    SGdatadir = os.path.join(os.path.dirname(seachest_data_dir), 'ARCTERX2022/sg526')
+    # filename = 'sg526_ARCTERX_1.0m_up_and_down_profile.nc'
+    filename = 'sg526_ARCTERX_timeseries.nc'
+    SGfnam = os.path.join(SGdatadir, filename)
+    SG_data = netcdf.Dataset(SGfnam)
+    # Sea Glider time
+    # ttSG = pd.to_datetime(epoch2datetime64(SG_data['start_time'][:]))
+    ttSG = pd.to_datetime(epoch2datetime64(SG_data['end_time'][:]))
+    # SG time index associated with start time
+    iiaSG = np.abs(ttSG - tst).argmin()
+    # crop data
+    SG_stlon = SG_data['start_longitude'][iiaSG:]
+    SG_stlat = SG_data['start_latitude'][iiaSG:]
+    SG_enlon = SG_data['end_longitude'][iiaSG:]
+    SG_enlat = SG_data['end_latitude'][iiaSG:]
+    ttSG = ttSG[iiaSG:]
+    # find sea-glider CTD data
+    # crop by time
+    ttSGctd = pd.to_datetime(epoch2datetime64(SG_data['ctd_time'][:]))
+    # SG time index associated with start time
+    iiaSGctd = np.abs(ttSGctd - tst).argmin()
+    SG_T = SG_data['temperature_raw'][iiaSGctd:]
+    SG_S = SG_data['salinity_raw'][iiaSGctd:]
+    SG_d = SG_data['ctd_depth'][iiaSGctd:]
+    ttSGctd = ttSGctd[iiaSGctd:]
+    # crop by depth
+    # depth of Wave Glider CTD
+    dWGctd = np.nanmean(ctdDPdf['pressure'].values)
+    iidSGctd = np.logical_and(SG_d<dWGctd+1,SG_d>dWGctd-1)
+
+# ----------------------------------------------------------------------------------------------------------------------
 # Plot
 # ----------------------------------------------------------------------------------------------------------------------
 if flg_plt:
@@ -210,8 +246,10 @@ if flg_plt:
 
     if prj == 'westpac':
         ax[0].plot(t_ROMSi, T_ROMSi, '.-', color='gray', label='ROMS')
+        ax[0].plot(ttSGctd[iidSGctd], SG_T[iidSGctd], 'o', color='m', label='SG')
         # ax[0].plot(t_ROMSi, T_ROMSn, '--', color='m', label='ROMS nearest')
         ax[1].plot(t_ROMSi, S_ROMSi, '.-', color='gray', label='ROMS')
+        ax[1].plot(ttSGctd[iidSGctd], SG_S[iidSGctd], 'o', color='m', label='SG')
         # ax[1].plot(t_ROMSi, S_ROMSn, '--', color='m', label='ROMS nearest')
         ax[0].legend(fontsize=fntsz)
 
