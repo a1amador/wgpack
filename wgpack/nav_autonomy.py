@@ -13,6 +13,8 @@ from wgpack.creds import WGMSun,WGMSpw
 # define xml and shell script folders
 xml_folder  = os.path.join(module_path,'xmls')
 # sh_folder   = os.path.join(module_path,'shell_scripts')
+if xml_folder not in sys.path:
+    sys.path.append(xml_folder)
 
 # create dictionary for for vehicle id's (WGMS)
 veh_list = {
