@@ -15,4 +15,4 @@ wgpack/xmls/*
 /tests/plotWGadcp_autoplot_concat.ipynb
 /arcterx/Ole_vs_Ragnar_mets.ipynb
 /dev/*
-/xmls/*
+# /xmls/*
