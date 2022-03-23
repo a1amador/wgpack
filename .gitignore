@@ -13,3 +13,6 @@ wgpack/xmls/*
 /tests/test_adcp_forRay.ipynb
 /tests/plotWGadcp_autoplot.ipynb
 /tests/plotWGadcp_autoplot_concat.ipynb
+/arcterx/Ole_vs_Ragnar_mets.ipynb
+/dev/*
+#/xmls/*
