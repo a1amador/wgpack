@@ -13,8 +13,6 @@ from wgpack.creds import WGMSun,WGMSpw
 # define xml and shell script folders
 xml_folder  = os.path.join(module_path,'xmls')
 # sh_folder   = os.path.join(module_path,'shell_scripts')
-if xml_folder not in sys.path:
-    sys.path.append(xml_folder)
 
 # create dictionary for for vehicle id's (WGMS)
 veh_list = {
@@ -108,4 +106,7 @@ def sendWPT(vnam,WaypointName,WaypointNumber,lat,lon):
     text_file.close()
 
     # Execute shell script that runs curl command
-    subprocess.call(['sh', os.path.join(xml_folder,'new_WPT.sh')])
+    # subprocess.call(['sh', os.path.join(xml_folder,'new_WPT.sh')])
+    ping = '/usr/bin/curl -X POST  -L -b ~/src/wgpack/xmls/headers -d @/home/a1amador/src/wgpack/xmls/wgms_new_WPT.xml http://gliders.wgms.com/webservices/entityapi.asmx --header "Content-Type:text/xml"'
+    data = subprocess.check_output(['bash', '-c', ping])
+
