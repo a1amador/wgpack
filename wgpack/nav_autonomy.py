@@ -4,15 +4,15 @@ from pathlib import Path
 # define parent and module path
 parent_path = os.path.abspath(os.path.join('..'))
 module_path = os.path.join(os.path.abspath(os.path.join('..')),'wgpack')
-# print(parent_path)
-# print(module_path)
+print(parent_path)
+print(module_path)
 if module_path not in sys.path:
     sys.path.append(module_path)
 from wgpack.creds import WGMSun,WGMSpw
 
 # define xml and shell script folders
-xml_folder  = os.path.join(parent_path,'xmls')
-sh_folder   = os.path.join(parent_path,'shell_scripts')
+xml_folder  = os.path.join(module_path,'xmls')
+sh_folder   = os.path.join(module_path,'shell_scripts')
 
 # create dictionary for for vehicle id's (WGMS)
 veh_list = {

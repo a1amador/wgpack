@@ -1,5 +1,5 @@
 '''
-This script updates Slocum latest position on WGMS. Slocum positions are obtained from
+This script updates Slocum Glider latest position on WGMS. Slocum positions are obtained from
 https://glidervm3.ceoas.oregonstate.edu/ARCTERX/
 '''
 
@@ -14,7 +14,7 @@ if module_path not in sys.path:
 from wgpack.nav_autonomy import sendWPT
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Read in SLOCUM posits from https://glidervm3.ceoas.oregonstate.edu/ARCTERX/
+# Read in Slocum Glider posits from https://glidervm3.ceoas.oregonstate.edu/ARCTERX/
 # ----------------------------------------------------------------------------------------------------------------------
 # Create an URL object
 url = 'https://glidervm3.ceoas.oregonstate.edu/ARCTERX/'
@@ -23,7 +23,7 @@ Assetdf = pd.read_html(url)[0]
 Slocdf = Assetdf[Assetdf['Asset']=='Slocum']
 
 # ----------------------------------------------------------------------------------------------------------------------
-# Send Slocum posits as WPT on WGMS
+# Send Slocum Glider posits as WPT on WGMS
 # ----------------------------------------------------------------------------------------------------------------------
 vnam = 'sv3-253'
 WaypointName  = 'Slocum ' + Slocdf['Time (UTC)'].values[-1] + ' UTC'
