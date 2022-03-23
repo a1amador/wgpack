@@ -12,7 +12,7 @@ from wgpack.creds import WGMSun,WGMSpw
 
 # define xml and shell script folders
 xml_folder  = os.path.join(module_path,'xmls')
-sh_folder   = os.path.join(module_path,'shell_scripts')
+# sh_folder   = os.path.join(module_path,'shell_scripts')
 
 # create dictionary for for vehicle id's (WGMS)
 veh_list = {
@@ -106,4 +106,4 @@ def sendWPT(vnam,WaypointName,WaypointNumber,lat,lon):
     text_file.close()
 
     # Execute shell script that runs curl command
-    subprocess.call(['sh', os.path.join(sh_folder,'new_WPT.sh')])
+    subprocess.call(['sh', os.path.join(xml_folder,'new_WPT.sh')])
