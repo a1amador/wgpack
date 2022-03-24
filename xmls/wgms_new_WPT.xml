@@ -7,20 +7,20 @@
         <CreateEntity xmlns="http://gliders.liquidr.com/webservicesWebServices"><entityType>53</entityType>
          <entityFieldXml>
        %3Centity%3E%3CWaypointName%3E
-    Slocum 2022-03-23 21:33:50
+    SG526 2022-03-24 00:27:33 UTC
        %3C%2FWaypointName%3E%3CWaypointNumber
        %3E
-    66
+    55
        %3C%2FWaypointNumber%3E%3CVehicleId%3E
-    5036
+    4980
        %3C%2FVehicleId%3E%3CCommunicationChannelSelect
        %3E
     6
        %3C%2FCommunicationChannelSelect%3E%3CVisible%3E1%3C%2FVisible%3E%3CWaypointStatus%3E1%3C%2FWaypointStatus%3E
        %3CLattitude%3E
-    18.7282333333
+    14.28795
        %3C%2FLattitude%3E%3CLongitude%3E
-    142.676483333
+    144.98680000000002
        %3C%2FLongitude%3E%3C%2Fentity%3E
          </entityFieldXml>
         </CreateEntity>
