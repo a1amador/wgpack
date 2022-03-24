@@ -1,6 +1,7 @@
 import sys,os
 import datetime
 import wget
+import subprocess
 import numpy as np
 import pandas as pd
 import netCDF4 as netcdf
@@ -10,7 +11,7 @@ print(module_path)
 if module_path not in sys.path:
     sys.path.append(module_path)
 from wgpack.config import seachest_data_dir
-datadir  = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/forecasts')
+datadir  = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/forecasts/PacIOOS')
 
 ta = datetime.datetime.utcnow().strftime('%Y-%m-%dT')+'00%3A00%3A00Z&'
 tb = (datetime.datetime.utcnow() + pd.Timedelta(days=5)).strftime('%Y-%m-%dT')+'00%3A00%3A00Z&'
@@ -148,4 +149,25 @@ if dwld_flg:
 
 # Read-in data
 # WW3_data = netcdf.Dataset(dfnam)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# LOAD high-res ROMS (Harper's Model)
+# ----------------------------------------------------------------------------------------------------------------------
+# data url and output filename
+yearday_str = datetime.datetime.utcnow().strftime('%j')
+filename = 'guam_his_00' + yearday_str + '.nc'
+data_url = os.path.join('https://vertmix.alaska.edu/ARCTERX/SA_2022/ROMS/GUAMDinner_1km_2022_03_21_UH_UH',filename)
+datadir  = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/forecasts/Harper/')
+dfnam    = os.path.join(datadir,filename)
+
+# Download data?
+dwld_flg=True
+# if file exist, remove it directly
+if dwld_flg:
+    if os.path.exists(dfnam):
+        os.remove(dfnam)
+    print('Beginning file download with wget subprocess...')
+    ping = 'wget --directory-prefix=' + datadir + ' --no-check-certificate https://vertmix.alaska.edu/ARCTERX/SA_2022/ROMS/GUAMDinner_1km_2022_03_21_UH_UH/guam_his_00083.nc'
+    subprocess.check_output(['bash', '-c', ping])
+    print('Downloaded ' + filename)
 

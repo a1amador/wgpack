@@ -45,7 +45,7 @@ sendWPT(vnam,WaypointName,WaypointNumber,lat,lon)
 
 # Slocum Glider destination waypoint
 vnam = 'sv3-253'
-WaypointName  = 'Slocum destination wpt'
+WaypointName  = 'Slocum target wpt'
 WaypointNumber= '56'
 lat = str(Slocdf['wptLat'][-1])
 lon = str(Slocdf['wptLon'][-1])

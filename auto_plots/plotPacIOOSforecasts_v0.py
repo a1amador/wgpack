@@ -19,7 +19,7 @@ if module_path not in sys.path:
 from wgpack.nav import get_bearing
 from wgpack.config import seachest_data_dir
 from wgpack.timeconv import epoch2datetime64
-datadir  = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/forecasts')
+datadir  = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/forecasts/PacIOOS')
 
 # Data service path
 ds_folder = os.path.join(str(Path.home()),'src/lri-wgms-data-service')

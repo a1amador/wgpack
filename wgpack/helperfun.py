@@ -86,3 +86,17 @@ def rotate_via_numpy(x,y,radians):
     m = np.dot(j, [x, y])
     return float(m.T[0]), float(m.T[1])
 
+def type_of_script():
+    '''
+    This function checks if code is executed in jupyter, ipython or in a terminal
+    :return: 'jupyter', 'ipython' or 'terminal'
+    '''
+    from IPython import get_ipython
+    try:
+        ipy_str = str(type(get_ipython()))
+        if 'zmqshell' in ipy_str:
+            return 'jupyter'
+        if 'terminal' in ipy_str:
+            return 'ipython'
+    except:
+        return 'terminal'

@@ -88,7 +88,7 @@ if prj == 'westpac':
     import netCDF4 as netcdf
     import re
     from scipy.interpolate import griddata
-    datadir = os.path.join(os.path.dirname(seachest_data_dir), 'ARCTERX2022/forecasts')
+    datadir = os.path.join(os.path.dirname(seachest_data_dir), 'ARCTERX2022/forecasts/PacIOOS')
 
     # ------------------------------------------------------------------------------------------------------------------
     # Read in vehicle location from Data Service
