@@ -109,10 +109,12 @@ def sendWPT(vnam,WaypointName,WaypointNumber,lat,lon):
     # subprocess.call(['sh', os.path.join(xml_folder,'new_WPT.sh')])
     # Login to WGMS
     print('LOGIN TO WGMS')
-    ping = '/usr/bin/curl -k -H "Content-Type: text/xml; charset=utf-8" --dump-header ~/src/wgpack/xmls/headers -H "SOAPAction:" -d @/home/a1amador/src/wgpack/xmls/login.xml -X POST https://gliders.wgms.com/webservices/entityapi.asmx'
+    # ping = '/usr/bin/curl -k -H "Content-Type: text/xml; charset=utf-8" --dump-header ~/src/wgpack/xmls/headers -H "SOAPAction:" -d @/home/a1amador/src/wgpack/xmls/login.xml -X POST https://gliders.wgms.com/webservices/entityapi.asmx'
+    ping = '/usr/bin/curl -k -H "Content-Type: text/xml; charset=utf-8" --dump-header' + xml_folder + '/headers -H "SOAPAction:" -d @' + xml_folder + '/login.xml -X POST https://gliders.wgms.com/webservices/entityapi.asmx'
     data_login = subprocess.check_output(['bash', '-c', ping])
     # Issue new waypoint
     print('ISSUING A NEW WAYPOINT')
-    ping = '/usr/bin/curl -X POST  -L -b ~/src/wgpack/xmls/headers -d @/home/a1amador/src/wgpack/xmls/wgms_new_WPT.xml http://gliders.wgms.com/webservices/entityapi.asmx --header "Content-Type:text/xml"'
+    # ping = '/usr/bin/curl -X POST  -L -b ~/src/wgpack/xmls/headers -d @/home/a1amador/src/wgpack/xmls/wgms_new_WPT.xml http://gliders.wgms.com/webservices/entityapi.asmx --header "Content-Type:text/xml"'
+    ping = '/usr/bin/curl -X POST  -L -b' + xml_folder + '/headers -d @' + xml_folder + '/wgms_new_WPT.xml http://gliders.wgms.com/webservices/entityapi.asmx --header "Content-Type:text/xml"'
     data_wpt = subprocess.check_output(['bash', '-c', ping])
 
