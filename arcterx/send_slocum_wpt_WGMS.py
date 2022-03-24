@@ -26,8 +26,8 @@ Slocdf = Assetdf[Assetdf['Asset']=='Slocum']
 # Send Slocum Glider posits as WPT on WGMS
 # ----------------------------------------------------------------------------------------------------------------------
 vnam = 'sv3-253'
-# WaypointName  = 'Slocum ' + Slocdf['Time (UTC)'].values[-1] + ' UTC'
-WaypointName  = 'Slocum'
+WaypointName  = 'Slocum ' + Slocdf['Time (UTC)'].values[-1] + ' UTC'
+# WaypointName  = 'Slocum'
 WaypointNumber= '55'
 lat = str(Slocdf['Latitude'].values[-1])
 lon = str(Slocdf['Longitude'].values[-1])
