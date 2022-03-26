@@ -160,14 +160,14 @@ data_url = os.path.join('https://vertmix.alaska.edu/ARCTERX/SA_2022/ROMS/GUAMDin
 datadir  = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/forecasts/Harper/')
 dfnam    = os.path.join(datadir,filename)
 
-# Download data?
-dwld_flg=True
+# Download data? - TODO: need to fix this!
+dwld_flg=False
 # if file exist, remove it directly
 if dwld_flg:
     if os.path.exists(dfnam):
         os.remove(dfnam)
     print('Beginning file download with wget subprocess...')
-    ping = 'wget --directory-prefix=' + datadir + ' --no-check-certificate https://vertmix.alaska.edu/ARCTERX/SA_2022/ROMS/GUAMDinner_1km_2022_03_21_UH_UH/guam_his_00083.nc'
+    ping = 'wget --directory-prefix=' + datadir + ' --no-check-cn ertificate https://vertmix.alaska.edu/ARCTERX/SA_2022/ROMS/GUAMDinner_1km_2022_03_21_UH_UH/guam_his_00083.nc'
     subprocess.check_output(['bash', '-c', ping])
     print('Downloaded ' + filename)
 
