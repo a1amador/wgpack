@@ -167,7 +167,7 @@ if dwld_flg:
     if os.path.exists(dfnam):
         os.remove(dfnam)
     print('Beginning file download with wget subprocess...')
-    ping = 'wget --directory-prefix=' + datadir + ' --no-check-cn ertificate https://vertmix.alaska.edu/ARCTERX/SA_2022/ROMS/GUAMDinner_1km_2022_03_21_UH_UH/guam_his_00083.nc'
+    ping = 'wget --directory-prefix=' + datadir + ' --no-check-certificate https://vertmix.alaska.edu/ARCTERX/SA_2022/ROMS/GUAMDinner_1km_2022_03_21_UH_UH/guam_his_00083.nc'
     subprocess.check_output(['bash', '-c', ping])
     print('Downloaded ' + filename)
 

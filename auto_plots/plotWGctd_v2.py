@@ -59,6 +59,7 @@ else:
     # tst = now - pd.Timedelta(days=7)
     # use prescribed splash date
     tst = datetime(2022, 3, 9, 8, 0, 0, 0)
+
 # Read in CTD output from Data Portal
 try:
     ctdDPdf = readDP_CTD(vid=vid, start_date=tst.strftime("%Y-%m-%dT%H:%M:%S.000Z"))
