@@ -185,8 +185,8 @@ if flg_plt:
                                   figsize=(12, 12), subplot_kw=dict(projection=ccrs.PlateCarree()))
 
     # Set map limits
-    dx = 2
-    dy = 2
+    dx = 0.33
+    dy = 0.33
     lonmin = Telemdf['longitude'][-1] - dx / 2
     lonmax = Telemdf['longitude'][-1] + dx / 2
     latmin = Telemdf['latitude'][-1] - dy / 2
