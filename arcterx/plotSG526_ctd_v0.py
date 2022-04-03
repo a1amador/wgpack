@@ -38,7 +38,9 @@ else:
     # use last 7 days
     # tst = now - pd.Timedelta(days=7)
     # use prescribed splash date
-    tst = datetime(2022, 3, 9, 8, 0, 0, 0)
+    # tst = datetime(2022, 3, 9, 8, 0, 0, 0)
+    # use experiment start date
+    tst = datetime(2022, 4, 1, 0, 0, 0, 0)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Remote
@@ -116,28 +118,44 @@ bin_S, binedges_S, binnumber_S = stats.binned_statistic(SG_d, SG_S, statistic='m
 # ----------------------------------------------------------------------------------------------------------------------
 # plot vertical profiles of salinity and temperature
 # ----------------------------------------------------------------------------------------------------------------------
-# fntsz = 14
-# sz = 6
-#
-# fig, ax = plt.subplots(1,2,figsize=(8,8))
-#
-# ax[0].scatter(SG_T,SG_d,c=doySGctd,s=sz,cmap='jet')
-# ax[0].plot(bin_T,bin_d[:-1],'--w',linewidth=2)
-# ax[0].set_xlabel('Temperature [deg C]',fontsize=fntsz)
-# ax[0].set_ylabel('Depth [m]',fontsize=fntsz)
-# ax[0].grid(':')
-# ax[0].invert_yaxis()
-#
-# cf = ax[1].scatter(SG_S,SG_d,c=doySGctd,s=sz,cmap='jet')
-# ax[1].plot(bin_S,bin_d[:-1],'--w',linewidth=2)
-# ax[1].invert_yaxis()
-# ax[1].set_xlabel('Salinity [psu]',fontsize=fntsz)
-# ax[1].set_xlim(33,35.5)
-# ax[1].grid(':')
-#
-# cbtstr = 'doy\n'
-# cb = fig.colorbar(cf, ax=ax[1], shrink=0.95)
-# cb.ax.set_title(cbtstr)
+fntsz = 14
+sz = 6
+
+fig, ax = plt.subplots(1,2,figsize=(8,8))
+
+ax[0].scatter(SG_T,SG_d,c=doySGctd,s=sz,cmap='jet')
+ax[0].plot(bin_T,bin_d[:-1],'--w',linewidth=2)
+ax[0].set_xlabel('Temperature [deg C]',fontsize=fntsz)
+ax[0].set_ylabel('Depth [m]',fontsize=fntsz)
+ax[0].grid(':')
+ax[0].invert_yaxis()
+
+cf = ax[1].scatter(SG_S,SG_d,c=doySGctd,s=sz,cmap='jet')
+ax[1].plot(bin_S,bin_d[:-1],'--w',linewidth=2)
+ax[1].invert_yaxis()
+ax[1].set_xlabel('Salinity [psu]',fontsize=fntsz)
+ax[1].set_xlim(33,35.5)
+ax[1].grid(':')
+
+cbtstr = 'doy\n'
+cb = fig.colorbar(cf, ax=ax[1], shrink=0.95)
+cb.ax.set_title(cbtstr)
+
+# --------------------------------------------------------
+# Save figure
+# Set local paths and import local packages
+from pathlib import Path
+loc_folder = os.path.join(str(Path.home()), 'src/calcofi/WGautonomy/auto_plots')
+figdir = os.path.join(loc_folder, 'figz', 'arcterx')
+figname = 'TSprof_SG526.png'
+fig.savefig(os.path.join(figdir, figname), dpi=100, bbox_inches='tight')
+# --------------------------------------------------------
+# Upload to CORDCdev - need to be on VPN (sio-terrill pool) to access CORDCdev
+# TODO: Consider defining these paths in config file (settings.py)
+LOCALpath_CD = os.path.join(figdir, figname)
+REMOTEpath_CD = os.path.join('/var/www/sites/cordcdev/data', 'westpac', 'arcterx', figname)
+SFTPAttr = sftp_put_cordcdev(LOCALpath_CD,REMOTEpath_CD)
+print('done uploading Sea Glider profile plots to CORDCdev')
 
 # ----------------------------------------------------------------------------------------------------------------------
 # pcolor plots
@@ -150,8 +168,7 @@ from matplotlib.dates import DateFormatter
 
 
 # Pcolor plot
-# fig, ax = plt.subplots(3,1,figsize=(10,7.5),sharex=True,sharey=True)
-fig, ax = plt.subplots(3,1,figsize=(20,14),sharex=True,sharey=True)
+fig, ax = plt.subplots(3,1,figsize=(15,10.5),sharex=True,sharey=True)
 
 X,Y = np.meshgrid(ttSGb, SG_data_b['depth'][:].data)
 # Temperature
@@ -179,15 +196,12 @@ ax[1].set_title(tistr)
 cbtstr = 'psu'
 cb = fig.colorbar(cf, ax=ax[1], shrink=0.95)
 cb.ax.set_title(cbtstr,fontsize=fntsz)
-# ax[1].set_title(tistr)
 
 
 # Density
 tistr ='density'
 Z = SG_densityb
 cf = ax[2].pcolor(X, Y, Z.T,cmap=cmocean.cm.dense)
-# cf = ax[2].pcolormesh(X, Y, Z.T, cmap=cmocean.cm.dense,shading='gouraud')
-# cf = ax[2].pcolormesh(Xn, Yn, Zn.T, cmap=cmocean.cm.dense)
 ax[2].invert_yaxis()
 ax[2].set_ylabel('depth [m]',fontsize=fntsz)
 # colorbar and labels
@@ -197,13 +211,16 @@ cb.ax.set_title(cbtstr)
 ax[2].set_title(tistr,fontsize=fntsz)
 
 # Define the date format
-date_form = DateFormatter("%m-%d")
+date_form = DateFormatter("%m/%d")
 ax[2].xaxis.set_major_formatter(date_form)
 
 # tick params
 ax[0].tick_params(labelsize=labsz)
 ax[1].tick_params(labelsize=labsz)
 ax[2].tick_params(labelsize=labsz)
+
+# set x-limits
+ax[2].set_xlim(tst,ttSGb[-1])
 
 # # save figure
 # savefig = False
@@ -227,5 +244,5 @@ fig.savefig(os.path.join(figdir, figname), dpi=100, bbox_inches='tight')
 LOCALpath_CD = os.path.join(figdir, figname)
 REMOTEpath_CD = os.path.join('/var/www/sites/cordcdev/data', 'westpac', 'arcterx', figname)
 SFTPAttr = sftp_put_cordcdev(LOCALpath_CD,REMOTEpath_CD)
-print('done uploading Sea Glider plots to CORDCdev')
+print('done uploading Sea Glider pcolor plots to CORDCdev')
 
