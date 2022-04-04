@@ -104,6 +104,22 @@ T90 = T90conv(SG_Tb)
 SG_densityb = sw.pden(SG_Sb, T90, SG_Pb, pr=0)
 
 # ----------------------------------------------------------------------------------------------------------------------
+# Sea Glider positions for Pat's server
+# ----------------------------------------------------------------------------------------------------------------------
+SG_posits_dict = {'time':ttSG,
+                 'lon':SG_enlon,
+                 'lat':SG_enlat}
+# Create dataframe
+SG_posits_df = pd.DataFrame(SG_posits_dict)
+# set time as index
+SG_posits_df.set_index('time',inplace=True)
+
+# save local file
+fnam_posits = 'sg_526_positions.csv'
+LOCALpath_CD = os.path.join(os.path.dirname(seachest_data_dir),'ARCTERX2022/sg526/',fnam_posits)
+SG_posits_df.to_csv(LOCALpath_CD)
+
+# ----------------------------------------------------------------------------------------------------------------------
 # bin vertical profiles of salinity and temperature
 # ----------------------------------------------------------------------------------------------------------------------
 nbins = 101
@@ -246,3 +262,6 @@ REMOTEpath_CD = os.path.join('/var/www/sites/cordcdev/data', 'westpac', 'arcterx
 SFTPAttr = sftp_put_cordcdev(LOCALpath_CD,REMOTEpath_CD)
 print('done uploading Sea Glider pcolor plots to CORDCdev')
 
+# --------------------------------------------------------
+# Save .csv with Sea Glider positions
+# --------------------------------------------------------
