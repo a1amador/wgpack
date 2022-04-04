@@ -35,4 +35,4 @@ for SGurl in SGurl_lst:
         with open(SGfnam, 'wb') as out:
             for bits in resp.iter_content():
                 out.write(bits)
-        print('Downloaded' + filename)
+        print('Downloaded ' + filename)
