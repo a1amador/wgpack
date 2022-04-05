@@ -151,10 +151,11 @@ fig, ax = plt.subplots(1,1,figsize=(12,12), subplot_kw=dict(projection=ccrs.Plat
 # Set map limits
 dx = 0.5
 dy = 0.5
-lonmin = sven_ctd_df['longitude'][-1] - dx / 2
-lonmax = sven_ctd_df['longitude'][-1] + dx / 2
-latmin = sven_ctd_df['latitude'][-1] - dy / 2
-latmax = sven_ctd_df['latitude'][-1] + dy / 2
+print(sven_ctd_df)
+lonmin = sven_ctd_df['longitude'].values[-1] - dx / 2
+lonmax = sven_ctd_df['longitude'].values[-1] + dx / 2
+latmin = sven_ctd_df['latitude'].values[-1] - dy / 2
+latmax = sven_ctd_df['latitude'].values[-1] + dy / 2
 ax.set_extent([lonmin, lonmax, latmin, latmax])
 # used to crop SSH
 iilon = np.logical_and(SSHnc['longitude'][:].data>lonmin-0.2,SSHnc['longitude'][:].data<lonmax+0.2)
