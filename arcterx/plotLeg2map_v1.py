@@ -177,9 +177,10 @@ ax.coastlines(resolution='10m')
 
 # plot Wave Glider location
 cf = ax.scatter(sven_ctd_df['longitude'].values, sven_ctd_df['latitude'].values,
-                        s=sz, c=T, cmap=pjet_cmap)
-ax.scatter(sven_ctd_df['longitude'].values[-1], Telemdf['latitude'].values[-1],
-                   s=sz*4, c=T[-1], marker='d', cmap=pjet_cmap, vmin=T.min(), vmax=T.max(), edgecolors='k')
+                        s=sz, c=sven_ctd_df['T'].values, cmap=pjet_cmap)
+ax.scatter(sven_ctd_df['longitude'].values[-1], sven_ctd_df['latitude'].values[-1],
+                    s=sz*4, c=sven_ctd_df['T'][-1], marker='d', cmap=pjet_cmap,
+                    vmin=sven_ctd_df['T'].min(), vmax=sven_ctd_df['T'].max(), edgecolors='k')
 
 # Sea Surface height anomally
 CS = ax.contour(SSHnc['longitude'][iilon].data,
