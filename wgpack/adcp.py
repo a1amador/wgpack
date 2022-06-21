@@ -32,12 +32,13 @@ def readADCP_raw(adcp_filepath_in, rdrpath, adcp_filepath_out=False, eng_exit=Tr
     return adcpr
 
 
-def motion_correct_ADCP_gps_h5py(adcpr, dt_gps, dt_avg, mag_dec=None, qc_flg=False):
+def motion_correct_ADCP_gps_h5py(adcpr, dt_gps, dt_avg, mag_dec=None, qc_flg=False,dtc=None):
     '''
     This function corrects ADCP velocities for Wave Glider motion using GPS-derived velocities.
     :param adcpr: output file from rdradcp.m (.mat file read using h5py)
     :param dt_gps: Time-averaging interval for GPS-derived velocities (s)
     :param dt_avg: Time-averaging interval for motion-corrected ADCP velocities (s)
+    :param dtc: time offset correction as numpy.timedelta64
     :return: dictionary containing motion-corrected ADCP velocities and auxiliary variables
     '''
     import datetime
@@ -55,6 +56,13 @@ def motion_correct_ADCP_gps_h5py(adcpr, dt_gps, dt_avg, mag_dec=None, qc_flg=Fal
                         - datetime.timedelta(days=366))
     # convert to pandas datetime
     nav_time = pd.to_datetime(nav_time)
+    # correct time offset
+    if dtc is None:
+        pass
+    else:
+        # correct time offset
+        nav_time = nav_time+dtc
+
     kk = len(nav_time)
     # nav variables
     pitch = np.array(adcpr['pitch'][:kk]).flatten()  #

@@ -1,5 +1,9 @@
 # Physical Oceanography module
 import numpy as np
+from scipy.interpolate import interp1d
+from wgpack.nav import get_WEAthet
+from wgpack.helperfun import nan_interpolate
+
 
 def compute_Dmbar(f, Dm, E):
     '''
@@ -139,3 +143,35 @@ def cdnlp(sp, z):
         u10 = sp / (1 + a * np.sqrt(cd))  # next iteration
         ii = abs(u10 - u10o) > tol  # keep going until iteration converges
     return cd, u10
+
+
+def Doppler_Ecorrect(fin, fout, E, Dm, cog, sog):
+    import numpy as np
+    # gravity constant
+    g = 9.8  # m/s^2
+    # calculate wave encounter angle based on mwb mean direction and convert to radians
+    thetr = np.deg2rad(get_WEAthet(cog, Dm))
+    # Calculate Doppler-corrected frequency
+    f0_tmp = (g - np.sqrt(g ** 2 - 4 * (2 * np.pi * sog * np.cos(thetr)) * (g * fin))) / (
+                2 * (2 * np.pi * sog * np.cos(thetr)))
+    # Doppler correction changes the frequency resolution, so a Jacobian is required to conserve spectral energy
+    J = np.gradient(fin) / np.gradient(f0_tmp)
+    # Remove outliers (TODO: there's probably a better way to deal with this issue)
+    J[J > 5] = np.nan
+    J[J < 0] = np.nan
+    E0_tmp = E * J
+    # sort frequency array
+    ii_sort = np.argsort(f0_tmp)
+    f0_tmp = f0_tmp[ii_sort]
+    E0_tmp = E0_tmp[ii_sort]
+    # interpolate over nans
+    n = 5
+    E0_tmp = nan_interpolate(E0_tmp, n)
+    # Interpolation function
+    fi_E = interp1d(f0_tmp, E0_tmp, fill_value="extrapolate")
+    # interpolate onto fout frequency array
+    E0i = fi_E(fout)
+    # extrapolated values are padded with zeros (or nans)
+    E0i[fout < fin[0]] = 0
+    E0i[fout > fin[-1]] = 0
+    return E0i

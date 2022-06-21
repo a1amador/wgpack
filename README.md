@@ -14,6 +14,9 @@ Contains test and example scripts
 **directory: wgpack/data**
 Contains data files for example scripts
 
+**directory: wgpack/autoplots**
+Contains data files for example scripts
+
 ---
 # Installation:
 

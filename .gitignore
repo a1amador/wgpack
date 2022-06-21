@@ -9,11 +9,14 @@
 /wgpack/__pycache__/*
 wgpack/xmls/*
 
+# ARCTERX
+/arcterx
+# /arcterx/*.ipynb
+
 # MISC
 /tests/test_adcp_forRay.ipynb
 /tests/plotWGadcp_autoplot.ipynb
 /tests/plotWGadcp_autoplot_concat.ipynb
-/arcterx/*.ipynb
 /dev/*
 /xmls/*
 /troubleshooting/*
