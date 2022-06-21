@@ -14,8 +14,8 @@ Contains test and example scripts
 **directory: wgpack/data**
 Contains data files for example scripts
 
-**directory: wgpack/autoplots**
-Contains data files for example scripts
+**directory: wgpack/auto_plots**
+Contains python scripts for automated plotting 
 
 ---
 # Installation:
@@ -24,7 +24,7 @@ Contains data files for example scripts
 `git clone seachest-git:a1amador/wgpack.git`
 
 ## 2) Create the environment from the wgpack_environment.yml file:
-`conda env create -f wgpack_environment.yml`
+`conda create --name wgpack --file requirements.txt`
 
 ## 3) Create config.py and creds.py 
 - wgpack/wgpack/config.py (copy from config_example.py) and define variables within it.
