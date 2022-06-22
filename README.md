@@ -21,7 +21,7 @@ Contains python scripts for automated plotting
 # Installation:
 
 ## 1) Create a copy of the remote repository files on your computer:
-`git clone seachest-git:a1amador/wgpack.git`
+`git clone https://seachest.ucsd.edu/waveglider/shoreside/toolbox/wgpack.git`
 
 ## 2) Create the environment from the wgpack_environment.yml file:
 `conda create --name wgpack --file requirements.txt`
