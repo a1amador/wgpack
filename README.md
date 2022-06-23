@@ -30,3 +30,5 @@ Contains python scripts for automated plotting
 - wgpack/wgpack/config.py (copy from config_example.py) and define variables within it.
 - wgpack/wgpack/creds.py (copy from creds_example.py) and define variables within it.
 
+
+test
