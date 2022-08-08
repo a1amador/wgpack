@@ -14,7 +14,8 @@ veh_list = {
     "sv3-253" : '131608817',
     "magnus"  : '502354689',
     "sv3-1087": '1981322853',
-    "sv3-1101": '773827499'
+    "sv3-1101": '773827499',
+    "sv3-1103": '870143490'
         }
 
 def readDP_waves(vid,start_date,end_date=datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S.000Z")):
