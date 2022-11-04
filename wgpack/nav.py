@@ -45,6 +45,7 @@ def get_WEAthet(COG,Dw):
     # Calculates and returns wave encounter angle  defined as...
     # References:
     # Estimations of on-site directional wave spectra from measured ship responses
+    # https://www.sciencedirect.com/science/article/pii/S0951833906000529
     # compute difference
     dth = COG-(Dw+180)%360
     # convert from [0,360] to [-180,180]

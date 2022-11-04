@@ -460,6 +460,7 @@ def OxHz2DO(F, dFdt, T, P, S, OxSol, vnam):
     References:
     05574 - USER GUIDE, SEA-BIRD ELECTRONICS GLIDER PAYLOAD CTD.pdf
     https://pythonhosted.org/seawater/eos80.html
+    https://www.seabird.com/asset-get.download.jsa?code=251036
     SBGPCTD command to display calibration coefficients on SMC
     ServerExec SBGPCTD "ctd --expert dc"
     '''
@@ -490,6 +491,21 @@ def OxHz2DO(F, dFdt, T, P, S, OxSol, vnam):
         C = -3.572600e-06
         E = 3.600000e-02  # Pressure correction factor
         TAU20 = 8.399999e-01  # Sensor time constant tau (T,P) at 20 degC, 1 atmosphere, 0 PSU; slope term in calculation of tau(T,P)
+        # D1, D2: Temperature and pressure correction factors in calculation of tau(T,P)
+        D1 = 1.926340e-04
+        D2 = -4.648030e-02
+        # H1, H2, H3: Hysteresis correction factors
+        H1, H2, H3 = -3.300000e-02, 5.000000e+03, 1.450000e+03
+    elif vnam == 'sv3-1103':
+        # SBE 43 S/N 3492 13-Jun-18
+        FOFFSET = -8.616800e+02  # Voltage at zero oxygen signal
+        SOC = 2.819200e-04   # Oxygen signal slope
+        # A, B, C: Residual temperature correction factors
+        A = -3.947500e-03
+        B = 1.961200e-04
+        C = -3.255900e-06
+        E = 3.600000e-02  # Pressure correction factor
+        TAU20 = 8.700000e-01  # Sensor time constant tau (T,P) at 20 degC, 1 atmosphere, 0 PSU; slope term in calculation of tau(T,P)
         # D1, D2: Temperature and pressure correction factors in calculation of tau(T,P)
         D1 = 1.926340e-04
         D2 = -4.648030e-02

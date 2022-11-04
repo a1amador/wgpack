@@ -81,13 +81,22 @@ def compute_Tp(f,E):
     :param E: wave energy spectra
     :return: peak period (Tp)
     '''
-    Tp=[]
-    for e in E:
+    if len(E.shape) == 1:
+        e = E
         # find peak period from infinity norm of normalized spectra
-        e_norm = e/np.trapz(e,f)
-        idx = (np.abs(e-np.linalg.norm(e_norm, ord=np.inf))).argmin()
-        Tp.append(1/f[idx])
-    Tp = np.array(Tp)
+        e_norm = e / np.trapz(e, f)
+        idx = (np.abs(e - np.linalg.norm(e_norm, ord=np.inf))).argmin()
+        Tp = 1 / f[idx]
+    elif len(E.shape)==2:
+        Tp=[]
+        for e in E:
+            # find peak period from infinity norm of normalized spectra
+            e_norm = e/np.trapz(e,f)
+            idx = (np.abs(e-np.linalg.norm(e_norm, ord=np.inf))).argmin()
+            Tp.append(1/f[idx])
+        Tp = np.array(Tp)
+    else:
+        print("error")
     return Tp
 
 def compute_Ta(f,E):
@@ -146,6 +155,29 @@ def cdnlp(sp, z):
 
 
 def Doppler_Ecorrect(fin, fout, E, Dm, cog, sog):
+    '''
+    % This function applies Doppler corrections tp wave frequency spectra
+% following the work of Collins III et al. (2017), and Amador et al. (2022)
+% Inputs:
+%       fin:    input vector containing the frequency bins [Hz]
+%       fout:   output frequencies (energy values will be interpolated
+%               onto this vector) [Hz]
+%       E:      omni-directional wave energy spectrum [m^2/Hz]
+%       Dm:     mean wave directions as a function of frequency
+%       cog:    vehicle course over ground [deg relative to true north]
+%       sog:    vehicle speed over ground [m/s]
+% Outputs:
+%       E0i: 	Doppler-corrected omni-directional wave spectrum
+% created by: Andre Amador
+% date: 10/12/2022
+    :param fin:
+    :param fout:
+    :param E:
+    :param Dm:
+    :param cog:
+    :param sog:
+    :return:
+    '''
     import numpy as np
     # gravity constant
     g = 9.8  # m/s^2
