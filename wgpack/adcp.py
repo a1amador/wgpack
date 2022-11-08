@@ -387,16 +387,22 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
     '''
     This function corrects ADCP velocities for Wave Glider motion using GPS-derived velocities.
     Reads-in output from rdrdadcp.py (python)
-    :param adcpr: output file from rdradcp.py
+    :param adcpr: output structure from rdradcp.py
     :param dt_gps: Time-averaging interval for GPS-derived velocities (s)
     :param dt_avg: Time-averaging interval for motion-corrected ADCP velocities (s)
     :param dtc: time offset correction as numpy.timedelta64
     :return: dictionary containing motion-corrected ADCP velocities and auxiliary variables
+    References:
+    https://github.com/rustychris/stompy/blob/master/stompy/io/rdradcp.py
+    Other resources:
+    https://seachest.ucsd.edu/cordc/analysis/rdradcpy
+    https://pypi.org/project/ADCPy/
     '''
     import datetime
-    import pyproj
     import numpy as np
     import pandas as pd
+    from geopy.distance import distance
+    from wgpack.nav import get_bearing
     # Collect variables:
     # time
     mtime = adcpr.nav_mtime
@@ -455,7 +461,6 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
     # ------------------------------------------------------------
     # Process GPS data
     # ------------------------------------------------------------
-    geodesic = pyproj.Geod(ellps='WGS84')
     # ping to ping dt
     dt_p2p = np.array(np.median(np.diff(nav_time)), dtype='timedelta64[s]').item().total_seconds()
     # number of points (full-step)
@@ -471,14 +476,16 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
         # dt = np.array(nav_time[ii+nn]-nav_time[ii-nn], dtype='timedelta64[s]').item().total_seconds()
         # this method is probably faster
         dt = (nav_time[ii + nn] - nav_time[ii - nn]).value / 1E9
-        azfwd, azback, dx = geodesic.inv(nav_elongitude[ii - nn], nav_elatitude[ii - nn],
-                                         nav_elongitude[ii + nn], nav_elatitude[ii + nn])
-        sog = dx / dt
+        # Calculate cog and sog from WG mwb coordinates
+        p1 = (nav_elatitude[ii - nn], nav_elongitude[ii - nn])
+        p2 = (nav_elatitude[ii + nn], nav_elongitude[ii + nn])
+        sog = distance(p1,p2).m/dt
+        cog = get_bearing(p1,p2)
         # store values
-        cog_gps.append((azfwd + 360) % 360)
+        cog_gps.append(cog)
         sog_gps.append(sog)
-        sog_gpse.append(sog * np.sin(np.deg2rad(azfwd)))
-        sog_gpsn.append(sog * np.cos(np.deg2rad(azfwd)))
+        sog_gpse.append(sog * np.sin(np.deg2rad(cog)))
+        sog_gpsn.append(sog * np.cos(np.deg2rad(cog)))
         pitch_mean.append(np.mean(pitch[ii - nn:ii + nn]))
         roll_mean.append(np.mean(roll[ii - nn:ii + nn]))
 
