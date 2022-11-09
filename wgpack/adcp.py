@@ -445,6 +445,8 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
     b2_intens = intens[:, :, 1]
     b3_intens = intens[:, :, 2]
     b4_intens = intens[:, :, 3]
+    # Temperature
+    temperature = adcpr.temperature
     # config variables
     ranges = adcpr.config.ranges
     beam_angle = adcpr.config.beam_angle
@@ -521,10 +523,10 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
     b = 1 / (4 * np.cos(theta))
     d = a / np.sqrt(2)
     # instrument velocities
-    x_vel = c * a * (b1_vel - b2_vel)
-    y_vel = c * a * (b4_vel - b3_vel)
-    z_vel = b * (b1_vel + b2_vel + b3_vel + b4_vel)
-    err_vel = d * (b1_vel + b2_vel - b3_vel - b4_vel)
+    x_vel = (c * a * (b1_vel - b2_vel)).T
+    y_vel = (c * a * (b4_vel - b3_vel)).T
+    z_vel = (b * (b1_vel + b2_vel + b3_vel + b4_vel)).T
+    err_vel = (d * (b1_vel + b2_vel - b3_vel - b4_vel)).T
     # ------------------------------------------------------------
     # Instrument to Ship
     h = -EA
@@ -535,9 +537,9 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
     cr = np.cos(np.deg2rad(roll))
     sr = np.sin(np.deg2rad(roll))
     # From Teledyne ADCP Coordinate Transformation, Formulas and Calculations
-    u = (ch * cr + sh * sp * sr) * x_vel.T + (sh * cp) * y_vel.T + (ch * sr - sh * sp * cr) * z_vel.T
-    v = (-sh * cr + ch * sp * sr) * x_vel.T + (ch * cp) * y_vel.T + (-sh * sr - ch * sp * cr) * z_vel.T
-    w = (-cp * sr) * x_vel.T + (sp) * y_vel.T + (cp * cr) * z_vel.T
+    u = (ch * cr + sh * sp * sr) * x_vel + (sh * cp) * y_vel + (ch * sr - sh * sp * cr) * z_vel
+    v = (-sh * cr + ch * sp * sr) * x_vel + (ch * cp) * y_vel + (-sh * sr - ch * sp * cr) * z_vel
+    w = (-cp * sr) * x_vel + (sp) * y_vel + (cp * cr) * z_vel
     # TODO: calculate and output velocities in vehicle reference frame
     # ------------------------------------------------------------
     # Instrument to Earth
@@ -554,8 +556,8 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
     cr = np.cos(np.deg2rad(roll))
     sr = np.sin(np.deg2rad(roll))
     # From Teledyne ADCP Coordinate Transformation, Formulas and Calculations
-    u = (ch * cr + sh * sp * sr) * x_vel.T + (sh * cp) * y_vel.T + (ch * sr - sh * sp * cr) * z_vel.T
-    v = (-sh * cr + ch * sp * sr) * x_vel.T + (ch * cp) * y_vel.T + (-sh * sr - ch * sp * cr) * z_vel.T
+    u = (ch * cr + sh * sp * sr) * x_vel + (sh * cp) * y_vel + (ch * sr - sh * sp * cr) * z_vel
+    v = (-sh * cr + ch * sp * sr) * x_vel + (ch * cp) * y_vel + (-sh * sr - ch * sp * cr) * z_vel
     # Correct ADCP velocities (gps-derived velocities)
     Evel = u + sog_gpse
     Nvel = v + sog_gpsn
@@ -574,5 +576,6 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
         'sog_gpse': sog_gpse,
         'sog_gpsn': sog_gpsn,
         'heading_float': heading_float,
+        'temperature':temperature,
         }
     return adcpmdict
