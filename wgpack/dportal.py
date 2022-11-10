@@ -5,7 +5,7 @@ import datetime
 import json
 import requests
 from requests.auth import HTTPBasicAuth
-from wgpack.creds import DPun,DPpw
+from .creds import DPun,DPpw
 
 # create dictionary for vehicle id's (Data Portal)
 veh_list = {

@@ -21,7 +21,7 @@ import scipy.stats.morestats as ssm
 from matplotlib.dates import date2num, num2date
 import datetime
 
-from wgpack.timeconv import datetime2matlabdn
+from .timeconv import datetime2matlabdn
 # from . import nmea
 
 cfac = 180.0 / (2 ** 31)

@@ -1,8 +1,10 @@
 # Physical Oceanography module
+# 3rd party imports
 import numpy as np
 from scipy.interpolate import interp1d
-from wgpack.nav import get_WEAthet
-from wgpack.helperfun import nan_interpolate
+# local imports
+from .nav import get_WEAthet
+from .helperfun import nan_interpolate
 
 
 def compute_Dmbar(f, Dm, E):

@@ -4,7 +4,7 @@ import paramiko
 import datetime
 import numpy as np
 import pandas as pd
-from wgpack.creds import SCun,SCpw,CDun,CDpw
+from .creds import SCun,SCpw,CDun,CDpw
 
 def sftp_mirror_seachest(REMOTEdir, LOCALdir):
     '''

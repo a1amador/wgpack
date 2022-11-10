@@ -1,6 +1,6 @@
 # Acoustic Doppler Current Profiler (ADCP) module
 import os
-from wgpack.helperfun import movingaverage,nan_interpolate
+from .helperfun import movingaverage,nan_interpolate
 
 def readADCP_raw(adcp_filepath_in, rdrpath, adcp_filepath_out=False, eng_exit=True):
     # To install matlab use the following commands:
@@ -402,7 +402,8 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
     import numpy as np
     import pandas as pd
     from geopy.distance import distance
-    from wgpack.nav import get_bearing
+    # local imports
+    from .nav import get_bearing
     # Collect variables:
     # time
     mtime = adcpr.nav_mtime
@@ -576,6 +577,6 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
         'sog_gpse': sog_gpse,
         'sog_gpsn': sog_gpsn,
         'heading_float': heading_float,
-        'temperature':temperature,
+        'temperature': temperature,
         }
     return adcpmdict

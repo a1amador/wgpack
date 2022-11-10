@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 import pandas as pd
 import netCDF4 as nc
-from wgpack.timeconv import timeIndexToDatetime
+from .timeconv import timeIndexToDatetime
 
 def get_HFR_currents(data_url, myLon, myLat, startdate, enddate=datetime.datetime.utcnow()):
     '''
