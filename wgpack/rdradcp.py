@@ -106,7 +106,8 @@ def rdradcp(name,
             nens=-1,  # or [start,stop] as 1-based, inclusive
             baseyear=2000,
             despike='no',
-            log_fp=None):
+            log_fp=None,
+            verbose=True):
     """
     The original documentation from Rich Pawlowicz's code:
 
@@ -242,9 +243,13 @@ def rdradcp(name,
     if log_fp is None:
         log_fp = sys.stdout
 
-    def msg(s):
-        log_fp.write(s)
-        log_fp.flush()
+    def msg(s, v=True):
+        if v:
+            log_fp.write(s)
+            log_fp.flush()
+        else:
+            pass
+
 
     century = baseyear  # ADCP clock does not have century prior to firmware 16.05.
     vels = despike  # Default to simple averaging
@@ -259,7 +264,7 @@ def rdradcp(name,
 
     # Read first ensemble to initialize parameters
 
-    [ens, hdr, cfg, pos] = rd_buffer(fd, -2, msg)  # Initialize and read first two records
+    [ens, hdr, cfg, pos] = rd_buffer(fd, -2, msg, verbose)  # Initialize and read first two records
     if ens is None:  # ~isstruct(ens) & ens==-1,
         msg("No Valid data found\n")
         return None
@@ -363,12 +368,12 @@ def rdradcp(name,
         # Gives display so you know something is going on...
 
         if k % 50 == 0:
-            msg("%d\n" % (k * num_av))
-        msg(".")
+            msg("%d\n" % (k * num_av), v=verbose)
+        msg(".", v=verbose)
 
         # Read an ensemble
 
-        [ens, hdr, cfg1, pos] = rd_buffer(fd, num_av, msg)
+        [ens, hdr, cfg1, pos] = rd_buffer(fd, num_av, msg, verbose)
 
         if ens is None:  # ~isstruct(ens), # If aborting...
             msg("Only %d records found..suggest re-running RDRADCP using this parameter\n" % ((k - 1) * num_av))
@@ -780,8 +785,7 @@ FIXOFFSET = None
 SOURCE = None
 
 
-
-def rd_buffer(fd, num_av, msg=msg_print):
+def rd_buffer(fd, num_av, msg=msg_print, verbose=True):
     """ RH: return ens=None, hdr=None if there's a problem
 
     returns (ens,hdr,cfg,pos)
@@ -1315,14 +1319,14 @@ def rd_buffer(fd, num_av, msg=msg_print):
             if n + 1 < len(hdr.dat_offsets):
                 if hdr.dat_offsets[n + 1] != byte_offset:
                     if not winrivprob:
-                        msg("%s: Adjust location by %d\n" % (id_, hdr.dat_offsets[n + 1] - byte_offset))
+                        msg("%s: Adjust location by %d\n" % (id_, hdr.dat_offsets[n + 1] - byte_offset), v=verbose)
                     fd.seek(hdr.dat_offsets[n + 1] - byte_offset, os.SEEK_CUR)
                 # end
                 byte_offset = hdr.dat_offsets[n + 1]
             else:
                 if hdr.nbyte - 2 != byte_offset:
                     if not winrivprob:
-                        msg("%s: Adjust location by %d\n" % (id_, hdr.nbyte - 2 - byte_offset))
+                        msg("%s: Adjust location by %d\n" % (id_, hdr.nbyte - 2 - byte_offset), v=verbose)
                     fd.seek(hdr.nbyte - 2 - byte_offset, os.SEEK_CUR)
                 # end
                 byte_offset = hdr.nbyte - 2
