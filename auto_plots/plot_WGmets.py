@@ -6,7 +6,10 @@ from pathlib import Path
 from scipy import stats
 
 # local imports
-module_path = os.path.abspath(os.path.join('..'))
+# --------------------------------------------------------
+# module_path = os.path.abspath(os.path.join('..'))
+module_path = os.path.join(os.path.abspath(os.path.join('..')),'wgpack')
+print(module_path)
 if module_path not in sys.path:
     sys.path.append(module_path)
 from wgpack.dportal import veh_list,readDP_weather
@@ -159,7 +162,9 @@ except:
 # --------------------------------------------------------
 # Plot
 # --------------------------------------------------------
-
+# convert windspeed from knots to m/s
+kt2mps = 0.514444
+airdf['WindSpeed'] = airdf['WindSpeed'] * kt2mps
 
 # if not Bdf_lst:
 #     fig = mets_bulk_autoplot_timeseries(WXTdf,airdf,figshow=True)
