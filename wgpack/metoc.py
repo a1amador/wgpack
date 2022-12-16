@@ -4,6 +4,9 @@ import pandas as pd
 import netCDF4 as nc
 from .timeconv import epoch2datetime64
 
+# knots to m/s
+kt2mps = 0.514444
+
 def read_mwbn(fname):
     '''
     This function reads in Miniature Wave Buoy (mwb) data - GPS-based directional wave measurements
@@ -177,3 +180,68 @@ def read_metbuoy(fname):
     WXTdf.set_index('Date',inplace=True)
     return WXTdf
 
+
+def read_metbuoy_SBD(fname):
+    '''
+    This function reads in SBD Metbuoy (mmb) data - WXT-based weather measurements
+    :param fname (str)  : full path + file name (.dat)
+    :return (dataframe) : dataframe structure with relevant weather variables
+    '''
+
+    # read in and concatenate WXT data
+    WXTdat = np.loadtxt(fname, skiprows=126)
+
+    # --------------------------------------------------------
+    # time
+    tep = WXTdat[:, 0]  # %column_001: Epoch (unit=s)
+    tt = pd.to_datetime(tep, unit='s')
+    # Latitude and Longitude
+    lat = WXTdat[:, 7]  # %column_008: Latitude (deg N)
+    lon = WXTdat[:, 8]  # %column_009: Longitude (deg E)
+    # true wind speed and directions
+    wspdE = WXTdat[:, 10] * kt2mps  # %column_011: True wind mean eastward velocity (Knots)
+    wspdN = WXTdat[:, 12] * kt2mps  # %column_013: True wind mean northward velocity (Knots)
+    wspd = WXTdat[:, 14] * kt2mps  # %column_015: True wind mean speed (Knots)
+    wdir = WXTdat[:, 15]  # %column_016: True wind mean direction (deg)
+    wspd_min = WXTdat[:, 16] * kt2mps  # %column_017: True wind minimum speed (Knots)
+    wspd_max = WXTdat[:, 17] * kt2mps  # %column_018: True wind maximum speed (Knots)
+    wspd10 = WXTdat[:, 34] * kt2mps  # %column_035: True Wind speed at 10m (Knots)
+    # pressure
+    Hg2mb = 33.8639
+    pressure_baro = WXTdat[:, 36] * Hg2mb  # %column_037: Barometric Pressure (in. Hg)
+    pressure_SL = WXTdat[:, 41]  # %column_042: Sea Level Pressure (mb)
+    # temperature
+    Tair = WXTdat[:, 37]  # %column_038: Air Temperature (C)
+    # relative humidity
+    Rh = WXTdat[:, 38]  # %column_039: Relative Humidity (%)
+    # platform speed and course over ground
+    cog = WXTdat[:, 71]  # %column_072: Mean course over ground (deg)
+    sog = WXTdat[:, 74] * kt2mps  # %column_075: Mean speed over ground (Knots)
+    # sogE = WXTdat[:,76]*kt2mps # %column_077: Platform mean eastward velocity (Knots)
+    # sogN = WXTdat[:,78]*kt2mps # %column_079: Platform mean northward velocity (Knots)
+
+    # Create dictionary
+    WXTdict = {
+        'Date': tt,
+        'latitude': lat,
+        'longitude': lon,
+        'wspdE': wspdE,
+        'wspdN': wspdN,
+        'wspd_min': wspd_min,
+        'wspd_max': wspd_max,
+        'WindSpeed': wspd,
+        'WindSpeed10': wspd10,
+        'WindDirection': wdir,
+        'pressure_SL': pressure_SL,
+        'pressure_baro': pressure_baro,
+        'temperature': Tair,
+        'RelativeHumidity': Rh,
+        'cog': cog,
+        'sog': sog,
+    }
+    # Create dataframe
+    WXTdf = pd.DataFrame(WXTdict)
+    # set time as index
+    WXTdf.set_index('Date', inplace=True)
+    WXTdf.sort_index(inplace=True)
+    return WXTdf

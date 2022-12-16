@@ -580,3 +580,166 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
         'temperature': temperature,
         }
     return adcpmdict
+
+
+def Doppler_vel_ADCP(adcpr, mag_dec=None, qc_flg=False, dtc=None):
+    '''
+    This function transforms Wave Glider ADCP beam velocities into an Earth reaference frame (no motion compensation).
+    :param adcpr: output file from rdradcp.m (.mat file read using h5py)
+    :param mag_dec:
+    :param qc_flg:
+    :return: dictionary containing ADCP Doppler velocities and auxiliary variables
+    '''
+    import datetime
+    import numpy as np
+    import pandas as pd
+    from geopy.distance import distance
+    # local imports
+    # from .nav import get_bearing
+    # Collect variables:
+    # time
+    mtime = adcpr.nav_mtime
+    # convert matlab datenum to datetime
+    nav_time = []
+    for mt in mtime:
+        nav_time.append(datetime.datetime.fromordinal(int(mt))
+                        + datetime.timedelta(days=mt % 1)
+                        - datetime.timedelta(days=366))
+
+    # convert to pandas datetime
+    nav_time = pd.to_datetime(nav_time)
+    # correct time offset
+    if dtc is None:
+        pass
+    else:
+        # correct time offset
+        nav_time = nav_time+dtc
+
+    # nav variables
+    pitch = adcpr.pitch
+    roll = adcpr.roll
+    heading = adcpr.heading
+    nav_elongitude = adcpr.nav_elongitude
+    nav_elatitude = adcpr.nav_elatitude
+    # Bottom tracking
+    bt_range = adcpr.bt_range
+    bt_range_mean = np.mean(bt_range, axis=1)
+    # Doppler velocities (beam)
+    b1_vel = adcpr.east_vel
+    b2_vel = adcpr.north_vel
+    b3_vel = adcpr.vert_vel
+    b4_vel = adcpr.error_vel
+    # QC variables
+    perc_good = adcpr.perc_good
+    corr = adcpr.corr
+    intens = adcpr.intens
+    # raw echo intensities
+    b1_intens = intens[:, :, 0]
+    b2_intens = intens[:, :, 1]
+    b3_intens = intens[:, :, 2]
+    b4_intens = intens[:, :, 3]
+    # Temperature
+    temperature = adcpr.temperature
+    # config variables
+    ranges = adcpr.config.ranges
+    beam_angle = adcpr.config.beam_angle
+    EA = adcpr.config.xducer_misalign
+    EB = adcpr.config.magnetic_var
+    xmit_pulse = adcpr.config.xmit_pulse
+    xmit_lag = adcpr.config.xmit_lag
+    # Magnetic declination correction (necessary when EB is configured incorrectly)
+    if mag_dec is None:
+        pass
+    else:
+        heading = (heading - EB + mag_dec) % 360
+
+
+    # ------------------------------------------------------------
+    # Q/C ADCP velocities
+    # ------------------------------------------------------------
+    # Note that percent-good (perc_good < 100) already masks velocity data with nans
+    if qc_flg:
+        # Along-beam velocities are rejected for instrument tilts greater than 20 deg
+        tilt_THRESH = 20
+        # pitch
+        b1_vel[:, np.abs(pitch > tilt_THRESH)] = np.nan
+        b2_vel[:, np.abs(pitch > tilt_THRESH)] = np.nan
+        b3_vel[:, np.abs(pitch > tilt_THRESH)] = np.nan
+        b4_vel[:, np.abs(pitch > tilt_THRESH)] = np.nan
+        # roll
+        b1_vel[:, np.abs(roll > tilt_THRESH)] = np.nan
+        b2_vel[:, np.abs(roll > tilt_THRESH)] = np.nan
+        b3_vel[:, np.abs(roll > tilt_THRESH)] = np.nan
+        b4_vel[:, np.abs(roll > tilt_THRESH)] = np.nan
+        # Along-beam velocities are rejected for along beam correlations below 90 counts
+        corr_THRESH = 80
+        b1_vel[corr[:, 0, :] < corr_THRESH] = np.nan
+        b2_vel[corr[:, 1, :] < corr_THRESH] = np.nan
+        b3_vel[corr[:, 2, :] < corr_THRESH] = np.nan
+        b4_vel[corr[:, 3, :] < corr_THRESH] = np.nan
+        # Along-beam velocities are rejected for along beam correlations below 90 counts
+        intens_THRESH = 50
+        b1_vel[intens[:, 0, :] < intens_THRESH] = np.nan
+        b2_vel[intens[:, 1, :] < intens_THRESH] = np.nan
+        b3_vel[intens[:, 2, :] < intens_THRESH] = np.nan
+        b4_vel[intens[:, 3, :] < intens_THRESH] = np.nan
+
+    # ------------------------------------------------------------
+    # Process ADCP velocities
+    # ------------------------------------------------------------
+    # Beam to Instrument
+    # Constants
+    c = 1
+    theta = np.deg2rad(beam_angle)  # beam angle
+    a = 1 / (2 * np.sin(theta))
+    b = 1 / (4 * np.cos(theta))
+    d = a / np.sqrt(2)
+    # instrument velocities
+    x_vel = (c * a * (b1_vel - b2_vel)).T
+    y_vel = (c * a * (b4_vel - b3_vel)).T
+    z_vel = (b * (b1_vel + b2_vel + b3_vel + b4_vel)).T
+    err_vel = (d * (b1_vel + b2_vel - b3_vel - b4_vel)).T
+    # ------------------------------------------------------------
+    # Instrument to Ship
+    h = -EA
+    ch = np.cos(np.deg2rad(h))
+    sh = np.sin(np.deg2rad(h))
+    cp = np.cos(np.deg2rad(pitch))
+    sp = np.sin(np.deg2rad(pitch))
+    cr = np.cos(np.deg2rad(roll))
+    sr = np.sin(np.deg2rad(roll))
+    # From Teledyne ADCP Coordinate Transformation, Formulas and Calculations
+    u = (ch * cr + sh * sp * sr) * x_vel + (sh * cp) * y_vel + (ch * sr - sh * sp * cr) * z_vel
+    v = (-sh * cr + ch * sp * sr) * x_vel + (ch * cp) * y_vel + (-sh * sr - ch * sp * cr) * z_vel
+    w = (-cp * sr) * x_vel + (sp) * y_vel + (cp * cr) * z_vel
+    # TODO: calculate and output velocities in vehicle reference frame
+    # ------------------------------------------------------------
+    # Instrument to Earth
+    h = heading
+    Tilt1 = np.deg2rad(pitch)
+    Tilt2 = np.deg2rad(roll)
+    P = np.arctan(np.tan(Tilt1) * np.cos(Tilt2))
+    ch = np.cos(np.deg2rad(h))
+    sh = np.sin(np.deg2rad(h))
+    cp = np.cos(np.deg2rad(pitch))
+    sp = np.sin(np.deg2rad(pitch))
+    # cp = np.cos(P)
+    # sp = np.sin(P)
+    cr = np.cos(np.deg2rad(roll))
+    sr = np.sin(np.deg2rad(roll))
+    # From Teledyne ADCP Coordinate Transformation, Formulas and Calculations
+    u = (ch * cr + sh * sp * sr) * x_vel + (sh * cp) * y_vel + (ch * sr - sh * sp * cr) * z_vel
+    v = (-sh * cr + ch * sp * sr) * x_vel + (ch * cp) * y_vel + (-sh * sr - ch * sp * cr) * z_vel
+
+    # Create output dictionary for motion-corrected ADCP data
+    adcpmdict = {
+        'time': nav_time,
+        'longitude': nav_elongitude,
+        'latitude': nav_elatitude,
+        'ranges': ranges,
+        'Evel': u,
+        'Nvel': v,
+        'vert_vel': w,
+        'err_vel': err_vel,
+    }
+    return adcpmdict

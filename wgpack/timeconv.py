@@ -29,16 +29,21 @@ def getUnixTimestamp(humanTime,dateFormat):
     unixTimestamp = int(time.mktime(datetime.datetime.strptime(humanTime, dateFormat).timetuple()))
     return unixTimestamp
 
-def timeIndexToDatetime(baseTime, times):
+def timeIndexToDatetime(baseTime, times, units='hours'):
     '''
     Function to turn time index into timestamp
     :param baseTime:
     :param times:
+    :param units:
     :return:
     '''
     newTimes = []
-    for ts in times:
-        newTimes.append(baseTime + datetime.timedelta(hours=ts))
+    if units=='hours':
+        for ts in times:
+            newTimes.append(baseTime + datetime.timedelta(hours=ts))
+    elif units=='days':
+        for ts in times:
+            newTimes.append(baseTime + datetime.timedelta(days=ts))
     return newTimes
 
 def mtime2datetime64(mtime):

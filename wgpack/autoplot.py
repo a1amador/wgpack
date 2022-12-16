@@ -482,7 +482,7 @@ def mets_bulk_autoplot(WXTdf,airdf,Bdf_lst,bidstr_lst,figshow=False):
 
     # Air pressure
     ax3.plot(airdf.index, airdf.pressure, '.r')
-    ax3.plot(WXTdf.index, WXTdf.pressure, '.b')
+    ax3.plot(WXTdf.index, WXTdf['pressure_baro'], '.b')
     ax3.set_ylabel('pressure [mbar]', fontsize=fntsz)
     ax3.tick_params(labelsize=labsz)
     ax3.set_xlim(tL)
@@ -553,7 +553,7 @@ def mets_bulk_autoplot(WXTdf,airdf,Bdf_lst,bidstr_lst,figshow=False):
                     # Store WXT values
                     Nb_wxt.append(len(iiwxt[0]))
                     wspd_wxt.append(np.nanmean(WXTdf.WindSpeed.values[iiwxt]))
-                    pres_wxt.append(np.nanmedian(WXTdf.pressure.values[iiwxt]))
+                    pres_wxt.append(np.nanmedian(WXTdf['pressure_baro'].values[iiwxt]))
                     atmp_wxt.append(np.nanmedian(WXTdf.temperature.values[iiwxt]))
                     wdir_wxt.append(np.nanmedian(WXTdf.WindDirection.values[iiwxt]))
                     # # vector average wind direction
@@ -680,14 +680,15 @@ def mets_bulk_autoplot_timeseries(WXTdf,airdf,figshow=False):
     else:
         tL = (WXTdf.index[0], now_utc)
     # widths = [3, 1]
-    heights = [1, 1, 1, 1]
+    heights = [1, 1, 1, 1, 1]
     gs_kw = dict(height_ratios=heights)
-    fig, fig_axes = plt.subplots(4, 1, gridspec_kw=gs_kw,figsize=(12, 8), sharex=True)
+    fig, fig_axes = plt.subplots(5, 1, gridspec_kw=gs_kw,figsize=(12, 10), sharex=True)
     # Time-series
     ax1 = fig_axes[0]
     ax2 = fig_axes[1]
     ax3 = fig_axes[2]
     ax4 = fig_axes[3]
+    ax5 = fig_axes[4]
 
     # Wind speed
     l2, = ax1.plot(airdf.index, airdf.WindSpeed, '.r')
@@ -707,7 +708,7 @@ def mets_bulk_autoplot_timeseries(WXTdf,airdf,figshow=False):
 
     # Air pressure
     ax3.plot(airdf.index, airdf.pressure, '.r')
-    ax3.plot(WXTdf.index, WXTdf.pressure, '.b')
+    ax3.plot(WXTdf.index, WXTdf['pressure_baro'], '.b')
     ax3.set_ylabel('pressure [mbar]', fontsize=fntsz)
     ax3.tick_params(labelsize=labsz)
     # ax3.set_xlim(airdf.index[0], airdf.index[-1])
@@ -717,7 +718,13 @@ def mets_bulk_autoplot_timeseries(WXTdf,airdf,figshow=False):
     ax4.plot(WXTdf.index, WXTdf.temperature, '.b')
     ax4.set_ylabel('air temperature [C]', fontsize=fntsz)
     ax4.tick_params(labelsize=labsz)
-    ax4.set_xlabel('Time [UTC]', fontsize=fntsz)
+    # ax4.set_xlabel('Time [UTC]', fontsize=fntsz)
+
+    # Air temperature
+    ax5.plot(WXTdf.index, WXTdf['RelativeHumidity'], '.b')
+    ax5.set_ylabel('relative hum. [%]', fontsize=fntsz)
+    ax5.tick_params(labelsize=labsz)
+    ax5.set_xlabel('Time [UTC]', fontsize=fntsz)
 
     # Legend
     leg_hlst = [l1, l2]

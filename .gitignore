@@ -13,6 +13,9 @@ wgpack/xmls/*
 /arcterx
 # /arcterx/*.ipynb
 
+# data
+/data/DM/*
+
 # MISC
 /dev/*
 /xmls/*
