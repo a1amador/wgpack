@@ -219,6 +219,9 @@ def read_metbuoy_SBD(fname):
     sog = WXTdat[:, 74] * kt2mps  # %column_075: Mean speed over ground (Knots)
     # sogE = WXTdat[:,76]*kt2mps # %column_077: Platform mean eastward velocity (Knots)
     # sogN = WXTdat[:,78]*kt2mps # %column_079: Platform mean northward velocity (Knots)
+    # compass heading
+    heading = WXTdat[:, 110] # %column_111: Compass mean heading (deg)
+
 
     # Create dictionary
     WXTdict = {
@@ -238,6 +241,7 @@ def read_metbuoy_SBD(fname):
         'RelativeHumidity': Rh,
         'cog': cog,
         'sog': sog,
+        'heading': heading,
     }
     # Create dataframe
     WXTdf = pd.DataFrame(WXTdict)

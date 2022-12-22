@@ -383,7 +383,7 @@ def Doppler_vel_ADCP_h5py(adcpr, mag_dec=None, qc_flg=False):
     return adcpmdict
 
 
-def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
+def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,three_beam_flg=False):
     '''
     This function corrects ADCP velocities for Wave Glider motion using GPS-derived velocities.
     Reads-in output from rdrdadcp.py (python)
@@ -524,10 +524,18 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None):
     b = 1 / (4 * np.cos(theta))
     d = a / np.sqrt(2)
     # instrument velocities
-    x_vel = (c * a * (b1_vel - b2_vel)).T
-    y_vel = (c * a * (b4_vel - b3_vel)).T
-    z_vel = (b * (b1_vel + b2_vel + b3_vel + b4_vel)).T
-    err_vel = (d * (b1_vel + b2_vel - b3_vel - b4_vel)).T
+    if three_beam_flg:
+        # Use 3-beam solution (excluding beam 4)
+        x_vel = (c * a * (b1_vel - b2_vel)).T
+        y_vel = (c * a * (b1_vel + b2_vel - 2*b3_vel)).T
+        z_vel = (2*b * (b1_vel + b2_vel)).T
+        err_vel = np.zeros_like(b4_vel).T
+    else:
+        # Use regular 4-beam solution
+        x_vel = (c * a * (b1_vel - b2_vel)).T
+        y_vel = (c * a * (b4_vel - b3_vel)).T
+        z_vel = (b * (b1_vel + b2_vel + b3_vel + b4_vel)).T
+        err_vel = (d * (b1_vel + b2_vel - b3_vel - b4_vel)).T
     # ------------------------------------------------------------
     # Instrument to Ship
     h = -EA

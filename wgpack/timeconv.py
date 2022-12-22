@@ -44,6 +44,9 @@ def timeIndexToDatetime(baseTime, times, units='hours'):
     elif units=='days':
         for ts in times:
             newTimes.append(baseTime + datetime.timedelta(days=ts))
+    elif units=='seconds':
+        for ts in times:
+            newTimes.append(baseTime + datetime.timedelta(seconds=ts))
     return newTimes
 
 def mtime2datetime64(mtime):

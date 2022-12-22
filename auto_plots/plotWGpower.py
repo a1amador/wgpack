@@ -128,7 +128,7 @@ fig.show()
 # --------------------------------------------------------
 # Save figure
 figdir = os.path.join(seachest_data_dir,vnam,'autoplots')
-figname = 'power_' + vnam + '.png'
+figname = 'power_' + vnam + '.jpg'
 fig.savefig(os.path.join(figdir,figname), dpi=100, bbox_inches='tight')
 
 # --------------------------------------------------------

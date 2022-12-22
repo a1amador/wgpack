@@ -3,6 +3,8 @@ import datetime
 import numpy as np
 import pandas as pd
 import netCDF4 as nc
+import os
+import glob
 from .timeconv import timeIndexToDatetime
 
 def get_HFR_currents(data_url, myLon, myLat, startdate, enddate=datetime.datetime.utcnow()):
@@ -76,3 +78,44 @@ def get_HFR_currents(data_url, myLon, myLat, startdate, enddate=datetime.datetim
     # set time as index
     HFRdf.set_index('Date', inplace=True)
     return HFRdf
+
+
+def get_HFR_hourly_from_dir(hf_dir):
+    '''
+    This function extracts HFR data from a directory and merges into a dictionary
+    :param hf_dir: full path to directory
+                    (e.g., '/Volumes/cordc-data/PROJECTS/hfrnet-fs-data/cordc/hfrtv/PW/2022_12/NetCDF')
+    :return: dictionary with HFR spatial and temporal data for that directory
+    '''
+
+    # get hourly files
+    hf_filst = [f for f in glob.glob(os.path.join(hf_dir, '*uwls_SIO.nc')) if os.path.isfile(os.path.join(hf_dir, f))]
+
+    times_lst, u_lst, v_lst = [], [], []
+    for fi in np.sort(hf_filst):
+        # get NetCDF data
+        netcdf_data = nc.Dataset(fi)
+        # Grab lat, lon and time variables from dataset
+        lat = netcdf_data.variables['lat'][:]
+        lon = netcdf_data.variables['lon'][:]
+        time = netcdf_data.variables['time'][:]
+        # set the time base
+        baseTime = datetime.datetime.strptime(netcdf_data.variables['time'].units, "seconds since %Y-%m-%d")
+        # Turn time index into timestamps
+        times = timeIndexToDatetime(baseTime, time.data.astype(float),
+                                    units=netcdf_data.variables['time'].units.split()[0])
+        # convert to DatetimeIndex
+        times_lst.append(times[0])
+        # This loads u & v current component data
+        # Note the indexing is [time, latitude, longitude]
+        u_lst.append(netcdf_data.variables['u'][0, :, :].filled(fill_value=np.nan))
+        v_lst.append(netcdf_data.variables['v'][0, :, :].filled(fill_value=np.nan))
+    # Create dictionary
+    hfr_d = {
+        'time': pd.to_datetime(times_lst),
+        'lon': lon.data,
+        'lat': lat.data,
+        'u': np.array(u_lst),
+        'v': np.array(v_lst)
+    }
+    return hfr_d
