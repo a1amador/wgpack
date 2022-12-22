@@ -366,7 +366,7 @@ ax[1].xaxis.set_major_formatter(date_form)
 fig.autofmt_xdate()
 
 # add a colorobar
-gs = gridspec.GridSpec(ncols=3, nrows=nrows, height_ratios=gs_kw['height_ratios'], right=1.05,figure=fig)
+gs = gridspec.GridSpec(ncols=3, nrows=nrows, height_ratios=gs_kw['height_ratios'], right=0.95,figure=fig)
 axc = fig.add_subplot(gs[0,-1])
 axc.set_visible(False)
 cbar = fig.colorbar(c, ax=axc,orientation='vertical')
