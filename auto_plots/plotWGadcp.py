@@ -338,7 +338,7 @@ fig, ax = plt.subplots(ncols=ncols, nrows=nrows,
                             sharex=True,
                             sharey=False,
                             gridspec_kw=gs_kw,
-                            figsize=(14, 11))
+                            figsize=(12, 10))
 
 # WG: East Vel
 x,y = np.meshgrid(tt,adcpm['ranges'])
