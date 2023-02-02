@@ -383,7 +383,7 @@ def Doppler_vel_ADCP_h5py(adcpr, mag_dec=None, qc_flg=False):
     return adcpmdict
 
 
-def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,three_beam_flg=False):
+def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False, dtc=None, three_beam_flg=None):
     '''
     This function corrects ADCP velocities for Wave Glider motion using GPS-derived velocities.
     Reads-in output from rdrdadcp.py (python)
@@ -391,6 +391,8 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,t
     :param dt_gps: Time-averaging interval for GPS-derived velocities (s)
     :param dt_avg: Time-averaging interval for motion-corrected ADCP velocities (s)
     :param dtc: time offset correction as numpy.timedelta64
+    :param three_beam_flg: if not None use a three-beam solution. The value (1,2,3,4) corresponds to the
+                           beam number that is excluded from the velocity solution
     :return: dictionary containing motion-corrected ADCP velocities and auxiliary variables
     References:
     https://github.com/rustychris/stompy/blob/master/stompy/io/rdradcp.py
@@ -421,7 +423,7 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,t
         pass
     else:
         # correct time offset
-        nav_time = nav_time+dtc
+        nav_time = nav_time + dtc
 
     # nav variables
     pitch = adcpr.pitch
@@ -482,8 +484,8 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,t
         # Calculate cog and sog from WG mwb coordinates
         p1 = (nav_elatitude[ii - nn], nav_elongitude[ii - nn])
         p2 = (nav_elatitude[ii + nn], nav_elongitude[ii + nn])
-        sog = distance(p1,p2).m/dt
-        cog = get_bearing(p1,p2)
+        sog = distance(p1, p2).m / dt
+        cog = get_bearing(p1, p2)
         # store values
         cog_gps.append(cog)
         sog_gps.append(sog)
@@ -523,19 +525,23 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,t
     a = 1 / (2 * np.sin(theta))
     b = 1 / (4 * np.cos(theta))
     d = a / np.sqrt(2)
-    # instrument velocities
-    if three_beam_flg:
-        # Use 3-beam solution (excluding beam 4)
-        x_vel = (c * a * (b1_vel - b2_vel)).T
-        y_vel = (c * a * (b1_vel + b2_vel - 2*b3_vel)).T
-        z_vel = (2*b * (b1_vel + b2_vel)).T
-        err_vel = np.zeros_like(b4_vel).T
-    else:
-        # Use regular 4-beam solution
-        x_vel = (c * a * (b1_vel - b2_vel)).T
-        y_vel = (c * a * (b4_vel - b3_vel)).T
-        z_vel = (b * (b1_vel + b2_vel + b3_vel + b4_vel)).T
-        err_vel = (d * (b1_vel + b2_vel - b3_vel - b4_vel)).T
+
+    # Use 3-beam solution
+    if three_beam_flg == 1:
+        b1_vel = -b2_vel + b3_vel + b4_vel
+    elif three_beam_flg == 2:
+        b2_vel = -b1_vel + b3_vel + b4_vel
+    elif three_beam_flg == 3:
+        b3_vel = b1_vel + b2_vel - b4_vel
+    elif three_beam_flg == 4:
+        b4_vel = b1_vel + b2_vel - b3_vel
+
+    # compute instrument velocities
+    x_vel = (c * a * (b1_vel - b2_vel)).T
+    y_vel = (c * a * (b4_vel - b3_vel)).T
+    z_vel = (b * (b1_vel + b2_vel + b3_vel + b4_vel)).T
+    err_vel = (d * (b1_vel + b2_vel - b3_vel - b4_vel)).T
+
     # ------------------------------------------------------------
     # Instrument to Ship
     h = -EA

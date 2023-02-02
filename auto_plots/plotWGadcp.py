@@ -80,7 +80,7 @@ for fnam in f:
         # ------------------------------------------------------------
         # Apply motion correction and concatenate daily files
         dt_gps = 120 # Motion correction time interval for GPS-derived velocities (s)
-        adcpm_d = motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,three_beam_flg=True)
+        adcpm_d = motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,three_beam_flg=4)
         # concatenate
         if cc==0:
             adcpm = adcpm_d.copy()
@@ -352,6 +352,7 @@ ax[0].invert_yaxis()
 x,y = np.meshgrid(tt,adcpm['ranges'])
 ax[1].pcolormesh(x,y,Vbar_WGi,vmin=-vL, vmax=vL, cmap = cm_msk)
 ax[1].set_ylim(yL)
+ax[1].set_ylabel(ylab_str,fontsize=fntsz)
 ax[1].set_title('North Velocities',fontsize=fntsz)
 ax[1].invert_yaxis()
 
