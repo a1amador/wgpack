@@ -526,15 +526,16 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False, dtc=None,
     b = 1 / (4 * np.cos(theta))
     d = a / np.sqrt(2)
 
-    # Use 3-beam solution
-    if three_beam_flg == 1:
-        b1_vel = -b2_vel + b3_vel + b4_vel
-    elif three_beam_flg == 2:
-        b2_vel = -b1_vel + b3_vel + b4_vel
-    elif three_beam_flg == 3:
-        b3_vel = b1_vel + b2_vel - b4_vel
-    elif three_beam_flg == 4:
-        b4_vel = b1_vel + b2_vel - b3_vel
+    if three_beam_flg is not None:
+        # then use 3-beam solution
+        if three_beam_flg == 1:
+            b1_vel = -b2_vel + b3_vel + b4_vel
+        elif three_beam_flg == 2:
+            b2_vel = -b1_vel + b3_vel + b4_vel
+        elif three_beam_flg == 3:
+            b3_vel = b1_vel + b2_vel - b4_vel
+        elif three_beam_flg == 4:
+            b4_vel = b1_vel + b2_vel - b3_vel
 
     # compute instrument velocities
     x_vel = (c * a * (b1_vel - b2_vel)).T
