@@ -18,6 +18,7 @@ Contains python scripts for automated plotting
 Contains MATLAB code to enable alternative processing of the ADCP binaries 
 
 For more information and documentation see:
+
 Amador, A., Merrifield, S.T., Terrill, E.J. (2022). “Assessment of atmospheric and oceanographic measurements from an autonomous surface vehicle”. Journal of Atmospheric and Oceanic Technology. [https://doi.org/10.1175/JTECH-D- 22-0060.1](https://doi.org/10.1175/JTECH-D-22-0060.1)
 
 
@@ -31,7 +32,7 @@ or
 
 `git clone https://github.com/a1amador/wgpack.git`
 
-## 2) Create the environment from the wgpack_environment.yml file:
+## 2) Create the environment from the requirements.txt file:
 `conda create --name wgpack --file requirements.txt`
 
 ## 3) Create config.py and creds.py 
