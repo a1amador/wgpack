@@ -1,12 +1,9 @@
 # Description:
 
-This repository contains data querying, processing, and analysis tools for CORDC's Wave Glider fleet. 
+This repository contains data querying, processing, and analysis tools for [CORDC](https://cordc.ucsd.edu/)'s Wave Glider fleet. 
 
 **directory: wgpack/wgpack**
 Contains data querying, processing, and analysis modules
-
-**directory: wgpack/mfiles**
-Contains MATLAB code to enable the processing of ADCP binaries 
 
 **directory: wgpack/tests**
 Contains test and example scripts
@@ -16,6 +13,9 @@ Contains data files for example scripts
 
 **directory: wgpack/auto_plots**
 Contains python scripts for automated plotting 
+
+**directory: wgpack/mfiles**
+Contains MATLAB code to enable alternative processing of the ADCP binaries 
 
 ---
 # Installation:
