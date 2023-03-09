@@ -1,5 +1,6 @@
 # Acoustic Doppler Current Profiler (ADCP) module
 import os
+import numpy as np
 from .helperfun import movingaverage,nan_interpolate
 
 def readADCP_raw(adcp_filepath_in, rdrpath, adcp_filepath_out=False, eng_exit=True):
@@ -407,8 +408,65 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False, dtc=None,
     # local imports
     from .nav import get_bearing
     # Collect variables:
-    # time
-    mtime = adcpr.nav_mtime
+    if type(adcpr)==dict:
+        # time (matlab datenum format)
+        mtime = adcpr['mtime']
+        # nav variables
+        pitch = adcpr['pitch']
+        roll = adcpr['roll']
+        heading = adcpr['heading']
+        nav_elongitude = adcpr['nav_elongitude']
+        nav_elatitude = adcpr['nav_elatitude']
+        # Bottom tracking
+        bt_range = adcpr['bt_range'].T
+        # Doppler velocities (beam)
+        b1_vel = adcpr['east_vel'].T
+        b2_vel = adcpr['north_vel'].T
+        b3_vel = adcpr['vert_vel'].T
+        b4_vel = adcpr['error_vel'].T
+        # QC variables
+        perc_good = adcpr['perc_good'].T
+        corr = adcpr['corr'].T
+        intens = adcpr['intens'].T
+        # Temperature
+        temperature = adcpr['temperature']
+        # config variables
+        ranges = adcpr['config']['ranges']
+        beam_angle = adcpr['config']['beam_angle']
+        EA = adcpr['config']['xducer_misalign']
+        EB = adcpr['config']['magnetic_var']
+        xmit_pulse = adcpr['config']['xmit_pulse']
+        xmit_lag = adcpr['config']['xmit_lag']
+    else:
+        # time (matlab datenum format)
+        mtime = adcpr.nav_mtime
+        # nav variables
+        pitch = adcpr.pitch
+        roll = adcpr.roll
+        heading = adcpr.heading
+        nav_elongitude = adcpr.nav_elongitude
+        nav_elatitude = adcpr.nav_elatitude
+        # Bottom tracking
+        bt_range = adcpr.bt_range
+        # Doppler velocities (beam)
+        b1_vel = adcpr.east_vel
+        b2_vel = adcpr.north_vel
+        b3_vel = adcpr.vert_vel
+        b4_vel = adcpr.error_vel
+        # QC variables
+        perc_good = adcpr.perc_good
+        corr = adcpr.corr
+        intens = adcpr.intens
+        # Temperature
+        temperature = adcpr.temperature
+        # config variables
+        ranges = adcpr.config.ranges
+        beam_angle = adcpr.config.beam_angle
+        EA = adcpr.config.xducer_misalign
+        EB = adcpr.config.magnetic_var
+        xmit_pulse = adcpr.config.xmit_pulse
+        xmit_lag = adcpr.config.xmit_lag
+
     # convert matlab datenum to datetime
     nav_time = []
     for mt in mtime:
@@ -425,38 +483,14 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False, dtc=None,
         # correct time offset
         nav_time = nav_time + dtc
 
-    # nav variables
-    pitch = adcpr.pitch
-    roll = adcpr.roll
-    heading = adcpr.heading
-    nav_elongitude = adcpr.nav_elongitude
-    nav_elatitude = adcpr.nav_elatitude
-    # Bottom tracking
-    bt_range = adcpr.bt_range
+    # bottom-tracking
     bt_range_mean = np.mean(bt_range, axis=1)
-    # Doppler velocities (beam)
-    b1_vel = adcpr.east_vel
-    b2_vel = adcpr.north_vel
-    b3_vel = adcpr.vert_vel
-    b4_vel = adcpr.error_vel
-    # QC variables
-    perc_good = adcpr.perc_good
-    corr = adcpr.corr
-    intens = adcpr.intens
     # raw echo intensities
     b1_intens = intens[:, :, 0]
     b2_intens = intens[:, :, 1]
     b3_intens = intens[:, :, 2]
     b4_intens = intens[:, :, 3]
-    # Temperature
-    temperature = adcpr.temperature
-    # config variables
-    ranges = adcpr.config.ranges
-    beam_angle = adcpr.config.beam_angle
-    EA = adcpr.config.xducer_misalign
-    EB = adcpr.config.magnetic_var
-    xmit_pulse = adcpr.config.xmit_pulse
-    xmit_lag = adcpr.config.xmit_lag
+
     # Magnetic declination correction (necessary when EB is configured incorrectly)
     if mag_dec is None:
         pass
@@ -758,3 +792,100 @@ def Doppler_vel_ADCP(adcpr, mag_dec=None, qc_flg=False, dtc=None):
         'err_vel': err_vel,
     }
     return adcpmdict
+
+def rdradcp_output_to_dictionary(adcpr):
+    '''
+    This function convert rdradcp output to a dictionary. This allows straightforward storage of the data in various
+    formats
+    :param adcpr: rdradcp output
+    :return: rdradcp output organized as a dictionary structure
+    '''
+    from .timeconv import datetime2matlabdn
+    from matplotlib.dates import date2num, num2date
+
+    # convert to matlab time
+    mtime = []
+    for mtime_r in adcpr.mtime:
+        dt = num2date(mtime_r).replace(tzinfo=None)
+        mtime.append(datetime2matlabdn(dt))
+    mtime = np.array(mtime)
+
+    # Convert config to dictionary
+    config_dict = {
+        'beam_angle': adcpr.config.beam_angle,
+        'beam_freq': adcpr.config.beam_freq,
+        'beam_pattern': adcpr.config.beam_pattern,
+        'bin1_dist': adcpr.config.bin1_dist,
+        'bin_mapping': adcpr.config.bin_mapping,
+        'blank': adcpr.config.blank,
+        'cell_size': adcpr.config.cell_size,
+        'config': adcpr.config.config,
+        'coord': adcpr.config.coord,
+        'coord_sys': adcpr.config.coord_sys,
+        'corr_threshold': adcpr.config.corr_threshold,
+        'evel_threshold': adcpr.config.evel_threshold,
+        'fls_target_threshold': adcpr.config.fls_target_threshold,
+        'h_adcp_beam_angle': adcpr.config.h_adcp_beam_angle,
+        'magnetic_var': adcpr.config.magnetic_var,
+        'min_pgood': adcpr.config.min_pgood,
+        'n_beams': adcpr.config.n_beams,
+        'n_cells': adcpr.config.n_cells,
+        'n_codereps': adcpr.config.n_codereps,
+        'name': adcpr.config.name,
+        'navigator_basefreqindex': adcpr.config.navigator_basefreqindex,
+        'numbeams': adcpr.config.numbeams,
+        'orientation': adcpr.config.orientation,
+        'pings_per_ensemble': adcpr.config.pings_per_ensemble,
+        'prof_mode': adcpr.config.prof_mode,
+        'prog_ver': adcpr.config.prog_ver,
+        'ranges': adcpr.config.ranges,
+        'sensors_avail': adcpr.config.sensors_avail,
+        'sensors_src': adcpr.config.sensors_src,
+        'serialnum': adcpr.config.serialnum,
+        'simflag': adcpr.config.simflag,
+        'sourceprog': adcpr.config.sourceprog,
+        'time_between_ping_groups': adcpr.config.time_between_ping_groups,
+        'use_3beam': adcpr.config.use_3beam,
+        'use_pitchroll': adcpr.config.use_pitchroll,
+        'water_ref_cells': adcpr.config.water_ref_cells,
+        'xducer_misalign': adcpr.config.xducer_misalign,
+        'xmit_lag': adcpr.config.xmit_lag,
+        'xmit_pulse': adcpr.config.xmit_pulse,
+    }
+
+    # Convert adcpr to dictionary
+    adcpr_dict = {
+        "name": adcpr.name,
+        "config": config_dict,
+        "mtime": mtime,
+        "nav_slongitude":adcpr.nav_slongitude,
+        "nav_elongitude": adcpr.nav_elongitude,
+        "nav_slatitude": adcpr.nav_slatitude,
+        "nav_elatitude": adcpr.nav_elatitude,
+        "number": adcpr.number,
+        "pitch": adcpr.pitch,
+        "roll": adcpr.roll,
+        "heading": adcpr.heading,
+        "pitch_std": adcpr.pitch_std,
+        "roll_std": adcpr.roll_std,
+        "heading_std": adcpr.heading_std,
+        "depth": adcpr.depth,
+        "temperature": adcpr.temperature,
+        "salinity": adcpr.salinity,
+        "pressure": adcpr.pressure,
+        "pressure_std": adcpr.pressure_std,
+        "east_vel": adcpr.east_vel.T,
+        "north_vel": adcpr.north_vel.T,
+        "vert_vel": adcpr.vert_vel.T,
+        "error_vel": adcpr.error_vel.T,
+        "corr": adcpr.corr.T,
+        "status": adcpr.status.T,
+        "intens": adcpr.intens.T,
+        "bt_range": adcpr.bt_range.T,
+        "bt_vel": adcpr.bt_vel.T,
+        "bt_corr": adcpr.bt_corr.T,
+        "bt_ampl": adcpr.bt_ampl.T,
+        "bt_perc_good": adcpr.bt_perc_good.T,
+        "perc_good": adcpr.perc_good.T
+    }
+    return adcpr_dict

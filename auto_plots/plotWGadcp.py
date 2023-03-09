@@ -7,7 +7,8 @@ from scipy import stats
 import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
 import matplotlib.gridspec as gridspec
-
+import pickle
+import scipy.io
 
 # module_path = os.path.abspath(os.path.join('..'))
 module_path = os.path.join(os.path.abspath(os.path.join('..')),'wgpack')
@@ -15,7 +16,7 @@ print(module_path)
 if module_path not in sys.path:
     sys.path.append(module_path)
 from wgpack.rdradcp import rdradcp
-from wgpack.adcp import motion_correct_ADCP_gps,Doppler_vel_ADCP
+from wgpack.adcp import motion_correct_ADCP_gps,Doppler_vel_ADCP,rdradcp_output_to_dictionary
 from wgpack.config import seachest_data_dir
 from wgpack.RDP import rdp
 from wgpack.nav import get_bearing
@@ -46,7 +47,7 @@ else:
     # use last 7 days
     tst = now - pd.Timedelta(days=7)
     # use prescribed splash date
-    # tst = datetime(2022, 1, 21, 19, 55, 17, 469297)
+    # tst = datetime(2022, 12, 14, 0, 0, 0, 0)
 
 # ----------------------------------------------------------------------------------------------------------------------
 # Processing
@@ -66,6 +67,8 @@ f.sort()
 cc=-1
 for fnam in f:
     adcp_filepath_in = os.path.join(REMOTEdir, fnam)
+    adcp_filepath_out_pkl = os.path.join(REMOTEdir + '_pkl',fnam.replace('PD0','pkl'))
+    adcp_filepath_out_mat = os.path.join(REMOTEdir + '_mat', fnam.replace('PD0', 'mat'))
     # file path and name for output .mat file
     fnam_out, file_extension = os.path.splitext(adcp_filepath_in)
     # extract dates
@@ -75,12 +78,28 @@ for fnam in f:
         cc+=1
         print(adcp_filepath_in)
         print(fdate)
-        # read-in ADCP binaries
-        adcpr = rdradcp(adcp_filepath_in, num_av=1, nens=-1, baseyear=2000, despike='no', log_fp=None, verbose=False)
+        if np.logical_and(not os.path.exists(adcp_filepath_out_pkl), len(spl_str) > 3) or\
+            np.logical_and(os.path.getmtime(adcp_filepath_out_pkl) < os.path.getmtime(adcp_filepath_in), len(spl_str) > 3):
+            print('updating ' + fnam.replace('PD0', 'pkl'))
+            # read-in ADCP binaries
+            adcpr = rdradcp(adcp_filepath_in, num_av=1, nens=-1, baseyear=2000, despike='no', log_fp=None,
+                            verbose=False)
+            # convert to dictionary
+            adcpr_dict = rdradcp_output_to_dictionary(adcpr)
+            # save dictionary to a file with pickle module
+            with open(adcp_filepath_out_pkl, 'wb') as outfile:
+                pickle.dump(adcpr_dict, outfile)
+            # Save the dictionary to a .mat file
+            scipy.io.savemat(adcp_filepath_out_mat, {"adcpr": adcpr_dict})
+        elif os.path.exists(adcp_filepath_out_pkl):
+            print('loading '+ fnam.replace('PD0','pkl'))
+            # Load previously saved ADCP data
+            with open(adcp_filepath_out_pkl, 'rb') as infile:
+                adcpr_dict = pickle.load(infile)
         # ------------------------------------------------------------
         # Apply motion correction and concatenate daily files
         dt_gps = 120 # Motion correction time interval for GPS-derived velocities (s)
-        adcpm_d = motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False,dtc=None,three_beam_flg=4)
+        adcpm_d = motion_correct_ADCP_gps(adcpr_dict, dt_gps, mag_dec=None, qc_flg=False,dtc=None,three_beam_flg=4)
         # concatenate
         if cc==0:
             adcpm = adcpm_d.copy()
@@ -92,7 +111,7 @@ for fnam in f:
                 else:
                     adcpm[key] = np.concatenate((adcpm[key], adcpm_d[key]))
 adcpm['ranges'] = np.unique(adcpm['ranges'])
-adcpm['time']=pd.to_datetime(adcpm['time'])
+adcpm['time'] = pd.to_datetime(adcpm['time'])
 
 # ----------------------------------------------------------------------
 # Find turning points using the RDP algorithm
