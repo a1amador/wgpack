@@ -110,8 +110,18 @@ for fnam in f:
                     adcpm[key] = np.concatenate((adcpm[key], adcpm_d[key]), axis=1)
                 else:
                     adcpm[key] = np.concatenate((adcpm[key], adcpm_d[key]))
-adcpm['ranges'] = np.unique(adcpm['ranges'])
 adcpm['time'] = pd.to_datetime(adcpm['time'])
+adcpm['ranges'] = np.unique(adcpm['ranges'])
+# handle ranges exception. The line above may not work when there are small differences in ranges
+THRESH_ranges_diff = 0.05
+if len(adcpm['ranges'])>adcpr_dict['config']['n_cells']:
+    print('handle range exception')
+    print('change from:')
+    print(adcpm['ranges'])
+    adcpm['ranges'] = adcpm['ranges'][1:][np.diff(adcpm['ranges']) < THRESH_ranges_diff]
+    print('to:')
+    print(adcpm['ranges'])
+assert(adcpm['Evel'].shape[0]==len(adcpm['ranges']))
 
 # ----------------------------------------------------------------------
 # Find turning points using the RDP algorithm
