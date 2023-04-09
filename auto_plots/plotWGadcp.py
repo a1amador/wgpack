@@ -33,7 +33,7 @@ channels= args[2]           # Slack channel
 tw      = args[3]           # time window to display specified in days (ends at present time)
 tw = None if tw == 'None' else tw
 prj     = args[4]           # project folder name (e.g., 'calcofi', 'tfo', etc.)
-# vnam, channels, tw, prj = 'sv3-125', 'C0158P2JJTT', '5', 'palau'
+# vnam, channels, tw, prj = 'sv3-125', 'C0158P2JJTT', '7', 'palau'
 
 print('vehicle:',vnam)
 print('project:',prj)
@@ -75,8 +75,7 @@ for fnam in f:
     spl_str = fnam.split('_')
     fdate = datetime.strptime(spl_str[-1][:-4], '%Y%m%d')
     if fdate > tst:
-        cc+=1
-        print(adcp_filepath_in)
+        print('\nAnalyzing file '+ adcp_filepath_in)
         print(fdate)
         if np.logical_and(not os.path.exists(adcp_filepath_out_pkl), len(spl_str) > 3) or\
             np.logical_and(os.path.getmtime(adcp_filepath_out_pkl) < os.path.getmtime(adcp_filepath_in), len(spl_str) > 3):
@@ -99,17 +98,23 @@ for fnam in f:
         # ------------------------------------------------------------
         # Apply motion correction and concatenate daily files
         dt_gps = 120 # Motion correction time interval for GPS-derived velocities (s)
-        adcpm_d = motion_correct_ADCP_gps(adcpr_dict, dt_gps, mag_dec=None, qc_flg=False,dtc=None,three_beam_flg=4)
-        # concatenate
-        if cc==0:
-            adcpm = adcpm_d.copy()
+        T_THRESH = 1 # files nee to be longer than T_THRESH (hours)
+        if (adcpr_dict['mtime'][-1]-adcpr_dict['mtime'][0])*24 >= T_THRESH:
+            cc += 1
+            adcpm_d = motion_correct_ADCP_gps(adcpr_dict, dt_gps, mag_dec=None, qc_flg=False,dtc=None,three_beam_flg=4)
+            # concatenate
+            if cc==0:
+                adcpm = adcpm_d.copy()
+            else:
+                for key in adcpm.keys():
+                    print(key,adcpm[key].shape)
+                    if len(adcpm[key].shape)>1:
+                        adcpm[key] = np.concatenate((adcpm[key], adcpm_d[key]), axis=1)
+                    else:
+                        adcpm[key] = np.concatenate((adcpm[key], adcpm_d[key]))
         else:
-            for key in adcpm.keys():
-                print(key,adcpm[key].shape)
-                if len(adcpm[key].shape)>1:
-                    adcpm[key] = np.concatenate((adcpm[key], adcpm_d[key]), axis=1)
-                else:
-                    adcpm[key] = np.concatenate((adcpm[key], adcpm_d[key]))
+            print('--> file is less than '+str(T_THRESH)+ ' hour. Skipping...\n')
+
 adcpm['time'] = pd.to_datetime(adcpm['time'])
 adcpm['ranges'] = np.unique(adcpm['ranges'])
 # handle ranges exception. The line above may not work when there are small differences in ranges

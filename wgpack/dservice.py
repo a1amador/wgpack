@@ -2,12 +2,13 @@ import sys,os
 import datetime
 import numpy as np
 import pandas as pd
-from pathlib import Path
+# local imports
+from .config import DSPATH
 
-# Data service path
-ds_folder = os.path.join(str(Path.home()), 'src/lri-wgms-data-service')
-if ds_folder not in sys.path:
-    sys.path.insert(0, ds_folder)
+# Add DataService path
+# TODO: Ryan changed lri-wgms-data-service to lri_wgms_data_service. Change and refactor
+if DSPATH not in sys.path:
+    sys.path.insert(0, DSPATH)
 from DataService import DataService
 
 def readDS_ADCP_C4T(vnam, start_date, end_date=datetime.datetime.utcnow()):

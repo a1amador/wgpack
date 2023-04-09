@@ -392,6 +392,7 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False, dtc=None,
     :param dt_gps: Time-averaging interval for GPS-derived velocities (s)
     :param dt_avg: Time-averaging interval for motion-corrected ADCP velocities (s)
     :param dtc: time offset correction as numpy.timedelta64
+    TODO: mag_dec
     :param three_beam_flg: if not None use a three-beam solution. The value (1,2,3,4) corresponds to the
                            beam number that is excluded from the velocity solution
     :return: dictionary containing motion-corrected ADCP velocities and auxiliary variables
