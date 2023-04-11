@@ -390,9 +390,8 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False, dtc=None,
     Reads-in output from rdrdadcp.py (python)
     :param adcpr: output structure from rdradcp.py
     :param dt_gps: Time-averaging interval for GPS-derived velocities (s)
-    :param dt_avg: Time-averaging interval for motion-corrected ADCP velocities (s)
+    :param mag_dec: magnetic delcination [deg]. Overrides the EB setting in the config file
     :param dtc: time offset correction as numpy.timedelta64
-    TODO: mag_dec
     :param three_beam_flg: if not None use a three-beam solution. The value (1,2,3,4) corresponds to the
                            beam number that is excluded from the velocity solution
     :return: dictionary containing motion-corrected ADCP velocities and auxiliary variables
@@ -496,6 +495,7 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False, dtc=None,
     if mag_dec is None:
         pass
     else:
+        # override EB with user specified magnetic declination
         heading = (heading - EB + mag_dec) % 360
 
     # ------------------------------------------------------------
