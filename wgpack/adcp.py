@@ -242,8 +242,9 @@ def Doppler_vel_ADCP_h5py(adcpr, mag_dec=None, qc_flg=False):
     '''
     This function transforms Wave Glider ADCP beam velocities into an Earth reaference frame.
     :param adcpr: output file from rdradcp.m (.mat file read using h5py)
-    :param mag_dec:
-    :param qc_flg:
+    :param mag_dec: magnetic delcination [deg]. Overrides the EB setting in the config file (necessary when EB is
+                    configured incorrectly)
+    :param qc_flg: Along-beam velocities will be rejected for instrument tilts greater than a tilt threshold (e.g., 20 deg)
     :return: dictionary containing ADCP Doppler velocities and auxiliary variables
     '''
     import datetime
@@ -389,8 +390,11 @@ def motion_correct_ADCP_gps(adcpr, dt_gps, mag_dec=None, qc_flg=False, dtc=None,
     This function corrects ADCP velocities for Wave Glider motion using GPS-derived velocities.
     Reads-in output from rdrdadcp.py (python)
     :param adcpr: output structure from rdradcp.py
-    :param dt_gps: Time-averaging interval for GPS-derived velocities (s)
-    :param mag_dec: magnetic delcination [deg]. Overrides the EB setting in the config file
+    :param dt_gps: Motion correction time-averaging interval for GPS-derived velocities (s)
+    :param mag_dec: magnetic delcination [deg]. Overrides the EB setting in the config file (necessary when EB is
+                    configured incorrectly)
+    :param qc_flg: Along-beam velocities will be rejected for instrument tilts greater than a tilt threshold
+                    (e.g., 20 deg)
     :param dtc: time offset correction as numpy.timedelta64
     :param three_beam_flg: if not None use a three-beam solution. The value (1,2,3,4) corresponds to the
                            beam number that is excluded from the velocity solution

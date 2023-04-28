@@ -26,6 +26,9 @@ from .timeconv import datetime2matlabdn
 
 cfac = 180.0 / (2 ** 31)
 
+# TODO: need to fix the following outputs
+# config: '101-112' (2016) vs. '01000001-01001010' (2016m)
+# coord: '13' (2016) vs. '00001011' (2016m)
 
 
 

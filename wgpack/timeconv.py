@@ -23,7 +23,7 @@ def getUnixTimestamp(humanTime,dateFormat):
     """
     Convert from human-format to UNIX timestamp.
     :param humanTime:
-    :param dateFormat:
+    :param dateFormat: (e.g., "%Y-%m-%d %H:%M:%S")
     :return:
     """
     unixTimestamp = int(time.mktime(datetime.datetime.strptime(humanTime, dateFormat).timetuple()))
